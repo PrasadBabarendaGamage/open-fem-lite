@@ -1,0 +1,8 @@
+To use these examples please set your PYTHON_PATH environmental variable to include the OpenFEMLite folder
+
+Mesh Examples
+MeshManualMeshCreationExample.py #Example illustrating manual mesh creation and export of mesh to ipnode/ipelem/ipmap/ipcoor/ipbase format
+MeshAutomaticMeshCreationExample.py #Example illustrating automatic mesh generation and export of mesh to ipnode/ipelem/ipmap/ipcoor/ipbase format
+MeshReadExistingMeshExample.py #Example illustrating how to read in an existing mesh in ipnode/ipelem/ipmap/ipcoor/ipbase format
+
+
