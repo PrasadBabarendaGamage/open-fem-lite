@@ -239,6 +239,46 @@ def WriteIpElem(FIELD_VARIABLE,OUTPUT_FILENAME):
 	FILE.write(OUTPUT)
 	FILE.close()
 
+def WriteIpElemAndLinearHydrostaticPressure(FIELD_VARIABLE,OUTPUT_FILENAME):
+	#Get mesh component from the first field component
+	NUMBER_OF_FIELD_COMPONENTS = FIELD_VARIABLE.NUMBER_OF_FIELD_COMPONENTS
+	FIELD_COMPONENT = FIELD_VARIABLE.FieldComponentGlobalGet(1)
+	MESH_COMPONENT = FIELD_COMPONENT.MESH_COMPONENT
+	NUMBER_OF_ELEMENTS = MESH_COMPONENT.ELEMENTS.NUMBER_OF_ELEMENTS
+	FILE = open(OUTPUT_FILENAME + ".ipelem", 'w')
+	OUTPUT = \
+" CMISS Version 2.1  ipelem File Version 2\n\
+ Heading:\n\
+ \n\
+ The number of elements is ["+"%5d" %NUMBER_OF_ELEMENTS +"]: "+"%5d" %NUMBER_OF_ELEMENTS
+	for element_idx in range(NUMBER_OF_ELEMENTS):
+		MESH_ELEMENT = MESH_COMPONENT.ELEMENTS.ELEMENTS[element_idx]
+		BASIS = MESH_ELEMENT.BASIS
+		OUTPUT = OUTPUT +\
+" \n\
+ Element number ["+"%5d" %MESH_ELEMENT.USER_NUMBER +"]: "+"%5d" %MESH_ELEMENT.USER_NUMBER +"\n\
+ The number of geometric Xj-coordinates is [%d]: %d\n" %(NUMBER_OF_FIELD_COMPONENTS,NUMBER_OF_FIELD_COMPONENTS)
+		for component_idx in range(NUMBER_OF_FIELD_COMPONENTS):
+			OUTPUT = OUTPUT + " The basis function type for geometric variable %d is [1]:  1\n" %(component_idx+1)
+		OUTPUT = OUTPUT + " Enter the %d global numbers for basis 1:" % BASIS.NUMBER_OF_NODES
+		for node_idx in range(BASIS.NUMBER_OF_NODES):
+			OUTPUT = OUTPUT + " "+"%5d" %MESH_ELEMENT.USER_ELEMENT_NODES[node_idx]
+		OUTPUT = OUTPUT + "\n Enter the %d numbers for basis 3 [prev]:" % BASIS.NUMBER_OF_NODES
+		for node_idx in range(BASIS.NUMBER_OF_NODES):
+			OUTPUT = OUTPUT + " "+"%5d" %MESH_ELEMENT.USER_ELEMENT_NODES[node_idx]
+#		if Mesh.ELEMENTS[i-1].hasVersions:
+#			for k in range(0,len(Mesh.ELEMENTS[i-1].versionNodes)):
+#				output = output +\
+#"\n\
+# The version number for occurrence  1 of node "+"%5d" %Mesh.ELEMENTS[i-1].versionNodes[k] +", njj=1 is [ 1]: "+"%d" %Mesh.ELEMENTS[i-1].versionNodesNumber[k] +" \n\
+# The version number for occurrence  1 of node "+"%5d" %Mesh.ELEMENTS[i-1].versionNodes[k] +", njj=2 is [ 1]: "+"%d" %Mesh.ELEMENTS[i-1].versionNodesNumber[k] +" \n\
+# The version number for occurrence  1 of node "+"%5d" %Mesh.ELEMENTS[i-1].versionNodes[k] +", njj=3 is [ 1]: "+"%d" %Mesh.ELEMENTS[i-1].versionNodesNumber[k] +" "
+		OUTPUT = OUTPUT +" \n"
+	OUTPUT = OUTPUT + "\n"
+#	output = output + "\n"
+	FILE.write(OUTPUT)
+	FILE.close()
+
 #============================================================================
 
 def WriteIpNode(FIELD_VARIABLE,OUTPUT_FILENAME):
@@ -529,6 +569,177 @@ def WriteIpBase(FIELD_VARIABLE,OUTPUT_FILENAME):
  Enter the number of auxiliary element parameters [0]:  0\n\
 \n\
  For basis function type 2 scale factors are [6]:\n\
+   (1) Unit\n\
+   (2) Read in - Element based\n\
+   (3) Read in - Node based\n\
+   (4) Calculated from angle change\n\
+   (5) Calculated from arc length\n\
+   (6) Calculated from arithmetic mean arc length\n\
+   (7) Calculated from harmonic mean arc length\n\
+	6\n"
+	FILE.write(OUTPUT)
+	FILE.close()
+
+
+def WriteSingleIpBase(FIELD_VARIABLE,OUTPUT_FILENAME):
+	REGION = FIELD_VARIABLE.REGION
+	FIELD_VARIABLE_USER_NUMBER = FIELD_VARIABLE.USER_NUMBER
+	FIELD = FIELD_VARIABLE.FIELD
+	FIELD_USER_NUMBER = FIELD.USER_NUMBER
+	FIELD_COMPONENT = FIELD_VARIABLE.FieldComponentGlobalGet(1)
+	MESH_COMPONENT = FIELD_COMPONENT.MESH_COMPONENT
+	NUMBER_OF_NODES = MESH_COMPONENT.NODES.NUMBER_OF_NODES
+	NUMBER_OF_FIELD_COMPONENTS = FIELD_VARIABLE.NUMBER_OF_FIELD_COMPONENTS
+	NUMBER_OF_DERIVATIVES = MESH_COMPONENT.NODES.BASIS_MAX_NUMBER_OF_DERIVATIVES
+	FILE = open(OUTPUT_FILENAME + ".ipbase", 'w')
+
+	if NUMBER_OF_DERIVATIVES == 1:
+		OUTPUT = \
+" CMISS Version 1.21 ipbase File Version 2\n\
+ Heading: 10% uniaxial extension of a unit cube\n\
+ \n\
+ Enter the number of types of basis function [1]: 1\n\
+ \n\
+ For basis function type 1 the type of nodal interpolation is [1]:\n\
+   (0) Auxiliary basis only\n\
+   (1) Lagrange/Hermite tensor prod\n\
+   (2) Simplex/Serendipity/Sector\n\
+   (3) B-spline tensor product\n\
+   (4) Fourier Series/Lagrange/Hermite tensor prod\n\
+   (5) Boundary Element Lagrange/Hermite tensor pr.\n\
+   (6) Boundary Element Simplex/Serendipity/Sector\n\
+   (7) Extended Lagrange (multigrid collocation)\n\
+	1\n\
+ Enter the number of Xi-coordinates [1]: 3\n\
+ \n\
+ The interpolant in the Xi(1) direction is [1]:\n\
+   (1) Linear Lagrange\n\
+   (2) Quadratic Lagrange\n\
+   (3) Cubic Lagrange\n\
+   (4) Quadratic Hermite\n\
+   (5) Cubic Hermite\n\
+	1\n\
+ Enter the number of Gauss points in the Xi(1) direction [2]: 2\n\
+ \n\
+ The interpolant in the Xi(2) direction is [1]:\n\
+   (1) Linear Lagrange\n\
+   (2) Quadratic Lagrange\n\
+   (3) Cubic Lagrange\n\
+   (4) Quadratic Hermite\n\
+   (5) Cubic Hermite\n\
+	1\n\
+ Enter the number of Gauss points in the Xi(2) direction [2]: 2\n\
+ \n\
+ The interpolant in the Xi(3) direction is [1]:\n\
+   (1) Linear Lagrange\n\
+   (2) Quadratic Lagrange\n\
+   (3) Cubic Lagrange\n\
+   (4) Quadratic Hermite\n\
+   (5) Cubic Hermite\n\
+	1\n\
+ Enter the number of Gauss points in the Xi(3) direction [2]: 2\n\
+ Enter the node position indices [111211121221112212122222]: 1 1 1 2 1 1 1 2 1 2 2 1 1 1 2 2 1 2 1 2 2 2 2 2\n\
+ Enter the number of auxiliary element parameters [0]: 0\n"
+
+	elif NUMBER_OF_DERIVATIVES == 4:
+		OUTPUT = \
+" CMISS Version 1.21 ipbase File Version 2\n\
+ Heading: cmgui generated file\n\
+\n\
+ Enter the number of types of basis function [1]: 1\n\
+\n\
+ For basis function type 1 the type of nodal interpolation is [1]:\n\
+   (0) Auxiliary basis only\n\
+   (1) Lagrange/Hermite tensor prod\n\
+   (2) Simplex/Serendipity/Sector\n\
+   (3) B-spline tensor product\n\
+   (4) Fourier Series/Lagrange/Hermite tensor prod\n\
+   (5) Boundary Element Lagrange/Hermite tensor pr.\n\
+   (6) Boundary Element Simplex/Serendipity/Sector\n\
+   (7) Extended Lagrange (multigrid collocation)\n\
+	1\n\
+ Enter the number of Xi-coordinates [1]: 2\n\
+\n\
+ The interpolant in the Xi(1) direction is [1]:\n\
+   (1) Linear Lagrange\n\
+   (2) Quadratic Lagrange\n\
+   (3) Cubic Lagrange\n\
+   (4) Quadratic Hermite\n\
+   (5) Cubic Hermite\n\
+	5\n\
+ Enter the number of Gauss points in the Xi(1) direction [2]: 4\n\
+ The interpolant in the Xi(2) direction is [1]:\n\
+   (1) Linear Lagrange\n\
+   (2) Quadratic Lagrange\n\
+   (3) Cubic Lagrange\n\
+   (4) Quadratic Hermite\n\
+   (5) Cubic Hermite\n\
+	5\n\
+ Enter the number of Gauss points in the Xi(2) direction [2]: 4\n\
+ Do you want to set cross derivatives to zero [N]? N\n\
+ Enter the node position indices []: 1 1 2 1 1 2 2 2\n\
+ Enter the derivative order indices []:  1 1 2 1 1 2 2 2\n\
+ Enter the number of auxiliary element parameters [0]:  0\n\
+\n\
+ For basis function type 1 scale factors are [6]:\n\
+   (1) Unit\n\
+   (2) Read in - Element based\n\
+   (3) Read in - Node based\n\
+   (4) Calculated from angle change\n\
+   (5) Calculated from arc length\n\
+   (6) Calculated from arithmetic mean arc length\n\
+   (7) Calculated from harmonic mean arc length\n\
+	6\n"
+	elif NUMBER_OF_DERIVATIVES == 8:
+
+		OUTPUT = \
+" CMISS Version 2.0  ipbase File Version 2\n\
+ Heading:\n\
+\n\
+ Enter the number of types of basis function [1]: 1\n\
+\n\
+ For basis function type 1 the type of nodal interpolation is [1]:\n\
+   (0) Auxiliary basis only\n\
+   (1) Lagrange/Hermite tensor prod\n\
+   (2) Simplex/Serendipity/Sector\n\
+   (3) B-spline tensor product\n\
+   (4) Fourier Series/Lagrange/Hermite tensor prod\n\
+   (5) Boundary Element Lagrange/Hermite tensor pr.\n\
+   (6) Boundary Element Simplex/Serendipity/Sector\n\
+   (7) Extended Lagrange (multigrid collocation)\n\
+	1\n\
+ Enter the number of Xi-coordinates [1]: 3\n\
+\n\
+ The interpolant in the Xi(1) direction is [1]:\n\
+   (1) Linear Lagrange\n\
+   (2) Quadratic Lagrange\n\
+   (3) Cubic Lagrange\n\
+   (4) Quadratic Hermite\n\
+   (5) Cubic Hermite\n\
+	5\n\
+ Enter the number of Gauss points in the Xi(1) direction [3]: 4\n\
+ The interpolant in the Xi(2) direction is [1]:\n\
+   (1) Linear Lagrange\n\
+   (2) Quadratic Lagrange\n\
+   (3) Cubic Lagrange\n\
+   (4) Quadratic Hermite\n\
+   (5) Cubic Hermite\n\
+	5\n\
+ Enter the number of Gauss points in the Xi(2) direction [3]: 4\n\
+ The interpolant in the Xi(3) direction is [1]:\n\
+   (1) Linear Lagrange\n\
+   (2) Quadratic Lagrange\n\
+   (3) Cubic Lagrange\n\
+   (4) Quadratic Hermite\n\
+   (5) Cubic Hermite\n\
+	5\n\
+ Enter the number of Gauss points in the Xi(3) direction [3]: 4\n\
+ Do you want to set cross derivatives to zero [N]? N\n\
+ Enter the node position indices [111211121221112212122222]: 1 1 1 2 1 1 1 2 1 2 2 1 1 1 2 2 1 2 1 2 2 2 2 2\n\
+ Enter the derivative order indices [111211121221112212122222]: 1 1 1 2 1 1 1 2 1 2 2 1 1 1 2 2 1 2 1 2 2 2 2 2\n\
+ Enter the number of auxiliary element parameters [0]:  0\n\
+\n\
+ For basis function type 1 scale factors are [6]:\n\
    (1) Unit\n\
    (2) Read in - Element based\n\
    (3) Read in - Node based\n\
