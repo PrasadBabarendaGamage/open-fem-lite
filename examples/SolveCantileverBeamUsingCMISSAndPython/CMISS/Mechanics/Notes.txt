@@ -1,0 +1,10 @@
+#Solve problem
+cm example_5e.com
+
+#View initial mesh
+cmgui VisualizeInitial
+
+#View deformed mesh
+cmgui Visualize
+
+Original CMISS example files for ths problem can be found at http://cmiss.bioeng.auckland.ac.nz/development/examples/5/5e/index.html
