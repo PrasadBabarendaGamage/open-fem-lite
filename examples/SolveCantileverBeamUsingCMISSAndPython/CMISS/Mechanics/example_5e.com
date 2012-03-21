@@ -63,6 +63,9 @@ fem solv inc 0.5 iter 100
 
 fem export node;Output/beam field as beam
 fem export elem;Output/beam field as beam
+fem update geometry from solution
+fem def node;w;beam;Output/
+fem def elem;w;beam;Output/
 q
 q
 

@@ -72,7 +72,7 @@ def GenerateCantileverBeamMesh(Extent,NumberOfElements,OutputDirectory):
     REGION.GENERATED_MESHES.GeneratedMeshMeshUserNumberSet(GeneratedMeshUserNumber,MeshUserNumber)
     REGION.GENERATED_MESHES.GeneratedMeshBasisSet(GeneratedMeshUserNumber,BasisUserNumber)
     REGION.GENERATED_MESHES.GeneratedMeshOriginSet(GeneratedMeshUserNumber,[0,0,0])
-    REGION.GENERATED_MESHES.GeneratedMeshMaximumExtentSet(GeneratedMeshUserNumber,Extent) #Size
+    REGION.GENERATED_MESHES.GeneratedMeshMaximumExtentSet(GeneratedMeshUserNumber,Extent) # Size
     REGION.GENERATED_MESHES.GeneratedMeshNumberOfElementsSet(GeneratedMeshUserNumber,NumberOfElements)
     REGION.GENERATED_MESHES.GeneratedMeshesCreateFinish(GeneratedMeshUserNumber)
 
