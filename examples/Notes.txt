@@ -1,4 +1,11 @@
 To use these examples please set your PYTHON_PATH environmental variable to include the OpenFEMLite folder
+eg 
+setenv PYTHONPATH "/home/psam012/Documents/SCRIPTS/PYTHON_SCRIPTS/OpenFEMLite/"
+Then cd into one of the example folders run python
+eg
+python MeshReadExistingMeshExample.py
+
+Tested on python 2.6 and 2.7
 
 Mesh Examples
 MeshManualMeshCreationExample.py #Example illustrating manual mesh creation and export of mesh to ipnode/ipelem/ipmap/ipcoor/ipbase format

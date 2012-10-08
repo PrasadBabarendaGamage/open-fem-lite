@@ -10,7 +10,7 @@ from CMISSGenerateMesh import GenerateCantileverBeamMesh
 from CMISSMeshRoutines import ReadInMesh,ExtractNodalParameters
 
 # Generate cubic Hermite cantilever mesh
-Extent = [60.0,40.0,40.0]
+Extent = [70.0,40.0,40.0]
 NumberOfElements = [4,2,2]
 OutputDirectory = "./CMISS/Mesh/beam" #Relative to the current (root directory)
 GenerateCantileverBeamMesh(Extent,NumberOfElements,OutputDirectory)
