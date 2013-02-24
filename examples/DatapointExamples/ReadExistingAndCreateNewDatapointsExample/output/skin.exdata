@@ -1,0 +1,28 @@
+ Group name: SKIN
+ #Fields=3
+ 1) coordinates, coordinate, rectangular cartesian, #Components=3
+  x.  Value index=1, #Derivatives=0, #Versions=1
+  y.  Value index=2, #Derivatives=0, #Versions=1
+  z.  Value index=3, #Derivatives=0, #Versions=1
+ 2) groupName, field, string, #Components=1
+  value.  Value index=4, #Derivatives=0, #Versions=1
+ 3) sliceName, field, string, #Components=1
+  value.  Value index=5, #Derivatives=0, #Versions=1
+ Node: 2077
+  2.708833000000000e+02
+  1.922389000000000e+02
+  6.181654000000000e-07
+ SKIN
+ image(101)
+ Node: 2078
+  2.540219000000000e+02
+  1.982788000000000e+02
+  6.181654000000000e-07
+ SKIN
+ image(101)
+ Node: 2079
+  2.253324000000000e+02
+  2.007954000000000e+02
+  6.181654000000000e-07
+ SKIN
+ image(101)

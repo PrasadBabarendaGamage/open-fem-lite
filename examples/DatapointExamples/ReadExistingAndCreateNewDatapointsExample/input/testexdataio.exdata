@@ -1,0 +1,64 @@
+ Group name: database
+ #Fields=3
+ 1) coordinates, coordinate, rectangular cartesian, #Components=3
+  x.  Value index=1, #Derivatives=0, #Versions=1
+  y.  Value index=2, #Derivatives=0, #Versions=1
+  z.  Value index=3, #Derivatives=0, #Versions=1
+ 2) groupName, field, string, #Components=1
+  value.  Value index=4, #Derivatives=0, #Versions=1
+ 3) sliceName, field, string, #Components=1
+  value.  Value index=5, #Derivatives=0, #Versions=1
+ Node: 189
+ 2.106226e+002
+ 1.850474e+002
+ 5.098038e+001
+ BONE
+ image(121)
+ Node: 190
+ 2.027065e+002
+ 1.826117e+002
+ 5.098038e+001
+ BONE
+ image(121)
+ Node: 2077
+ 2.708833e+002
+ 1.922389e+002
+ 6.181654e-007
+ SKIN
+ image(101)
+ Node: 2078
+ 2.540219e+002
+ 1.982788e+002
+ 6.181654e-007
+ SKIN
+ image(101)
+ Node: 5309
+ 2.147937e+002
+ 2.099944e+002
+ 6.176471e+001
+ LANDMARKS
+ image(122)
+ Node: 2079
+ 2.253324e+002
+ 2.007954e+002
+ 6.181654e-007
+ SKIN
+ image(101)
+ Node: 1
+ 2.660284e+002
+ 2.584666e+002
+ 4.588235e+001
+ NIPPLE
+ image(119)
+ Node: 2
+ 2.612035e+002
+ 2.592066e+002
+ 4.588235e+001
+ NIPPLE
+ image(119)
+ Node: 3
+ 2.575546e+002
+ 2.592066e+002
+ 4.588235e+001
+ NIPPLE
+ image(119)
