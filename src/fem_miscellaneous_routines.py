@@ -39,6 +39,15 @@
 #> the terms of any one of the MPL, the GPL or the LGPL.
 #>
 
+def remove_from_list(list_, remove):
+    new_list = copy.deepcopy(list_)
+    for item in remove:
+        try:
+            new_list.remove(item)
+        except:
+            pass
+    return new_list
+
 def removeDuplicates(seq,idfun=None):
     # order preserving
     if idfun is None:
@@ -67,7 +76,6 @@ def initialize3DList(VALUE,A,B,C):
 
 def initialize4DList(VALUE,A,B,C,D):
     return [[[[VALUE for i in range(D)] for j in range(C)] for k in range(B)] for l in range(A)]
-#
 
 def CMISS_intStringToArray(String):
 	StringArray = String.split(',')
