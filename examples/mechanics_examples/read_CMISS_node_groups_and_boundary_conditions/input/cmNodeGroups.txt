@@ -1,0 +1,84 @@
+> fem list node group
+ Number of node groups = 36
+ Group  1 Label= SHOULDER_NODES                 Total=      3 :
+        3        4        5
+ Group  2 Label= STERNUMNODES                   Total=      8 :
+        1        8       15       22     1001     1008     1015     1022
+ Group  3 Label= STERNUMRIBNODES                Total=      4 :
+     1001     1008     1015     1022
+ Group  4 Label= STERNUMSKINNODES               Total=      4 :
+        1        8       15       22
+ Group  5 Label= AXILLANODES                    Total=      8 :
+        7       14       21       28     1007     1014     1021     1028
+ Group  6 Label= AXILLARIBNODES                 Total=      4 :
+     1007     1014     1021     1028
+ Group  7 Label= RIBNODES                       Total=     28 :
+     1001     1002     1003     1004     1005     1006     1007     1008     1009     1010
+     1011     1012     1013     1014     1015     1016     1017     1018     1019     1020
+     1021     1022     1023     1024     1025     1026     1027     1028
+ Group  8 Label= BREASTRIBNODES                 Total=     28 :
+     1001     1002     1003     1004     1005     1006     1007     1008     1009     1010
+     1011     1012     1013     1014     1015     1016     1017     1018     1019     1020
+     1021     1022     1023     1024     1025     1026     1027     1028
+ Group  9 Label= CRANNODES                      Total=     14 :
+        1        2        3        4        5        6        7     1001     1002     1003
+     1004     1005     1006     1007
+ Group 10 Label= CRANRIBNODES                   Total=      7 :
+     1001     1002     1003     1004     1005     1006     1007
+ Group 11 Label= CAUDNODES                      Total=     14 :
+       22       23       24       25       26       27       28     1022     1023     1024
+     1025     1026     1027     1028
+ Group 12 Label= CAUDRIBNODES                   Total=      7 :
+     1022     1023     1024     1025     1026     1027     1028
+ Group 13 Label= CRANCAUDRIBNODES               Total=     14 :
+     1001     1002     1003     1004     1005     1006     1007     1022     1023     1024
+     1025     1026     1027     1028
+ Group 14 Label= CRANCAUDNODES                  Total=     28 :
+        1        2        3        4        5        6        7       22       23       24
+       25       26       27       28     1001     1002     1003     1004     1005     1006
+     1007     1022     1023     1024     1025     1026     1027     1028
+ Group 15 Label= CAUDAXNODE                     Total=      2 :
+       28     1028
+ Group 16 Label= CAUDRIBAXNODE                  Total=      1 :
+     1028
+ Group 17 Label= CRANAXNODE                     Total=      2 :
+        7     1007
+ Group 18 Label= CRANRIBAXNODE                  Total=      1 :
+     1007
+ Group 19 Label= AX_CORNER_EDGE_NODES           Total=      4 :
+        7       28     1007     1028
+ Group 20 Label= AXRIB_CORNER_EDGE_NODES        Total=      2 :
+     1007     1028
+ Group 21 Label= CAUDSTNODE                     Total=      2 :
+       22     1022
+ Group 22 Label= CAUDRIBSTNODE                  Total=      1 :
+     1022
+ Group 23 Label= CRANSTNODE                     Total=      2 :
+        1     1001
+ Group 24 Label= CRANRIBSTNODE                  Total=      1 :
+     1001
+ Group 25 Label= ST_CORNER_EDGE_NODES           Total=      4 :
+        1       22     1001     1022
+ Group 26 Label= STRIB_CORNER_EDGE_NODES        Total=      2 :
+     1001     1022
+ Group 27 Label= CRANAXRIBNODE                  Total=      1 :
+     1007
+ Group 28 Label= CAUDAXRIBNODE                  Total=      1 :
+     1028
+ Group 29 Label= CRANAXSKINNODE                 Total=      1 :
+        7
+ Group 30 Label= CAUDAXSKINNODE                 Total=      1 :
+       28
+ Group 31 Label= CRANSTRIBNODE                  Total=      1 :
+     1001
+ Group 32 Label= CAUDSTRIBNODE                  Total=      1 :
+     1022
+ Group 33 Label= CRANSTSKINNODE                 Total=      1 :
+        1
+ Group 34 Label= CAUDSTSKINNODE                 Total=      1 :
+       22
+ Group 35 Label= RIB_AXILA_CORNER_NODES         Total=      2 :
+     1007     1028
+ Group 36 Label= RIB_STERNUM_CORNER_NODES       Total=      2 :
+     1001     1022
+

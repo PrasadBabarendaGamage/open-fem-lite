@@ -39,11 +39,14 @@
 #> the terms of any one of the MPL, the GPL or the LGPL.
 #>
 
+import re
+import math
+import pprint
+
 import fem_generatedMeshRoutines
 import fem_quadratureRoutines
 import fem_miscellaneous_routines
 import fem_ioRoutines
-
 
 #============================================================================
 #General subroutines
@@ -57,10 +60,13 @@ def global_number_get(attribute, reference):
             raise ValueError(
                 'The specified user number of {:} is invalid for {:}'.format(
                       reference, attribute.identifier))
-    else:  # Reference is not an integer
-        raise ValueError(
-            'The specified user number of {:} is not an int for {:}'.format(
-            reference, attribute.identifier))
+    else:  # Reference is a label
+        try:
+            globalNumber = attribute.globalToLabelMap.index(reference)  # Invese map
+        except ValueError:
+            raise ValueError(
+                'The specified reference of {:} is invalid for {:'.format(
+                      reference, attribute.identifier))
     return globalNumber
 
 def femInitialize():
@@ -77,6 +83,7 @@ class Region():
         self.GENERATED_MESHES = GeneratedMeshes(self)
         self.MESHES = Meshes(self)
         self.DATAPOINTS = DatapointGroups(self)
+        self.NODEGROUPS = NodeGroups()
 
     def ReadMesh(self,BASIS_USER_NUMBER,MESH_USER_NUMBER,FIELD_USER_NUMBER,FILE_FORMAT,IPNODE_INPUT_FILENAME,IPELEM_INPUT_FILENAME):
         if FILE_FORMAT == "CMISS":
@@ -1200,5 +1207,120 @@ class DatapointGroups():
 
     def DatapointGroupCreateFinish(self,USER_NUMBER):
         pass
+
+#============================================================================
+
+class BoundaryCondition():
+
+    def __init__(self, ):
+        self.derivatives = [[]]*3 # Indexed by field component
+        self.numberOfderivatives = [[]]*3 # Indexed by field component
+
+    def add(self, derivatives, fieldComponent):
+        self.derivatives[fieldComponent-1] = derivatives
+        self.numberOfderivatives[fieldComponent-1] = len(derivatives)
+
+class NodeGroup():
+
+
+    def __init__(self, groupNumber, label, numberOfNodes, nodes):
+        self.groupNumber = groupNumber
+        self.label = label
+        self.numberOfNodes = numberOfNodes
+        self.nodes = nodes
+        self.bc = BoundaryCondition()
+
+class NodeGroups():
+
+
+    def __init__(self, ):
+        self.identifier = "NodeGroups"
+        self.numberOfNodeGroups = 0
+        self.globalToUserMap = []
+        self.nodeGroups = []
+        self.globalToLabelMap =[]
+        self.bcNodeGroupLabelOrder = []
+
+    def node_groups_add(self, userNumber, label, numberOfNodes, nodes):
+        self.numberOfNodeGroups += 1
+        self.globalToUserMap.append(userNumber)
+        self.globalToLabelMap.append(label)
+        self.nodeGroups.append(
+            NodeGroup(userNumber, label, numberOfNodes, nodes))
+
+    def node_group_global_get(self, userNumber):
+        return self.nodeGroups[global_number_get(self, userNumber)]
+
+    def display_node_groups(self, listNodes=False, listDerivatives=False):
+        for userNumber in self.globalToUserMap:
+            nodeGroup = self.node_group_global_get(userNumber)
+            print 'Group {0:>3} Label= {1:<30} Total= {2:>4}'.format(
+                userNumber, nodeGroup.label, nodeGroup.numberOfNodes)
+            if listNodes:
+                print 'Nodes:'
+                pp = pprint.PrettyPrinter()
+                pp.pprint(nodeGroup.nodes)
+            if listDerivatives:
+                print 'Derivatives:'
+                pp = pprint.PrettyPrinter()
+                pp.pprint(nodeGroup.bc.derivatives)
+
+    def extract_node_groups(self, inputFilename):
+        text = open(inputFilename).read()
+        lineArray = re.split(r'[\n\\]', text)
+        nodesPerLine = 10
+
+        for line in range(len(lineArray)):
+            if lineArray[line][0:7] == ' Group ':
+                userNumber = int(lineArray[line].split()[1])
+                label = lineArray[line].split()[3]
+                numberOfNodes = int(lineArray[line].split()[-2])
+                nodes = []
+
+                for nodeLine in range(1, int(
+                        math.ceil(numberOfNodes/float(nodesPerLine)))+1):
+                    nodes += lineArray[line+nodeLine].split()
+                nodes = map(int, nodes)
+                self.node_groups_add(userNumber, label, numberOfNodes,
+                                   nodes)
+
+    def extract_boundary_conditions(self, inputFilename):
+        text = open(inputFilename).read()
+        lineArray = re.split(r'[\n\\]', text)
+        nodesPerLine = 10
+        fieldComponent = 0
+
+        labelOrder = [[]]*3
+        for line in range(len(lineArray)):
+            if lineArray[line].find('Dependent variable/equation number') > -1:
+                fieldComponent += 1
+
+            if lineArray[line].find(' Enter node #s/name [EXIT]: ') > -1 :
+                if lineArray[line].split()[-1] != '0':
+                    globalToLabelMap = lineArray[line].split()[-1].split(',')
+                    derivatives = []
+                    labelOrder[fieldComponent-1].append(globalToLabelMap)
+                    for derivative in range(1, 9):
+                        line += 1
+                        if lineArray[line].split()[-1].lower() == 'y':
+                            derivatives.append(derivative)
+                            # Skip line which states the value of the BC. 
+                            line += 1 
+
+                    for nodeGroupLabel in globalToLabelMap:
+                        self.boundary_condition_add(
+                            nodeGroupLabel, derivatives, fieldComponent)
+        self.boundary_condition_add_label_order(labelOrder)
+
+    """Add a boundary condition using either userNumber or label"""
+    def boundary_condition_add(self, group, derivatives, fieldComponent):
+        # Selection between userNumber/label is automatically catered for.  
+        nodeGroup = self.node_group_global_get(group)
+        nodeGroup.bc.add(derivatives, fieldComponent)
+
+    """Add a boundary condition using either userNumber or label"""
+    def boundary_condition_add_label_order(self, labelOrder):
+        # Selection between userNumber/label is automatically catered for.  
+        self.bcNodeGroupLabelOrder = labelOrder
 
 #============================================================================
