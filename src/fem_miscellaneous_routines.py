@@ -39,6 +39,8 @@
 #> the terms of any one of the MPL, the GPL or the LGPL.
 #>
 
+import copy
+
 def remove_from_list(list_, remove):
     new_list = copy.deepcopy(list_)
     for item in remove:

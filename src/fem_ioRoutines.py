@@ -752,33 +752,35 @@ def WriteSingleIpBase(FIELD_VARIABLE,OUTPUT_FILENAME):
     FILE.close()
 
 def WriteIpCoor(FIELD_VARIABLE,OUTPUT_FILENAME):
-    FILE = open(OUTPUT_FILENAME + ".ipcoor", 'w')
-    OUTPUT = \
-" CMISS Version 2.1  ipcoor File Version 1\n\
- Heading:\n\
- \n\
- The global coordinates for region 1 are [1]:\n\
-   (1) rectangular cartesian (x,y,z)\n\
-   (2) cylindrical polar (r,theta,z)\n\
-   (3) spherical polar (r,theta,phi)\n\
-   (4) prolate spheroidal (lambda,mu,theta)\n\
-   (5) oblate  spheroidal (lambda,mu,theta)\n\
-    1\n\
- Enter the number of global coordinates [%d]: %d"%(FIELD_VARIABLE.NUMBER_OF_FIELD_COMPONENTS,FIELD_VARIABLE.NUMBER_OF_FIELD_COMPONENTS) +"\n\
- Do you want to specify another coord. system for dependent variables [N]? N\n\
- The geometry is [1]:\n\
-   (1) unsymmetric\n\
-   (2) cylindrically symmetric about x (or r for cyl.polar)\n\
-   (3) cylindrically symmetric about y (or z for cyl.polar)\n\
-   (4) spherically   symmetric\n\
-   (5) mirror symmetry in x\n\
-   (6) mirror symmetry in y\n\
-   (7) mirror symmetry in x and y\n\
-    1\n\
- Enter x,y,z origin of coords relative to region 0 [0,0,0]:  0.00000E+00  0.00000E+00  0.00000E+00\n\
- Are there any non-standard mappings [N]? N\n"
-    FILE.write(OUTPUT)
-    FILE.close()
+    number_of_field_components = FIELD_VARIABLE.NUMBER_OF_FIELD_COMPONENTS
+    file_id = open(OUTPUT_FILENAME + ".ipcoor", 'w')
+    file_id.write(' CMISS Version 2.1  ipcoor File Version 1\n')
+    file_id.write(' Heading:\n')
+    file_id.write(' \n')
+    file_id.write(' The global coordinates for region 1 are [1]:\n')
+    file_id.write('   (1) rectangular cartesian (x,y,z)\n')
+    file_id.write('   (2) cylindrical polar (r,theta,z)\n')
+    file_id.write('   (3) spherical polar (r,theta,phi)\n')
+    file_id.write('   (4) prolate spheroidal (lambda,mu,theta)\n')
+    file_id.write('   (5) oblate  spheroidal (lambda,mu,theta)\n')
+    file_id.write('    1\n')
+    file_id.write(' Enter the number of global coordinates [{0}]: {1}\n'.format(
+        FIELD_VARIABLE.NUMBER_OF_FIELD_COMPONENTS,
+        FIELD_VARIABLE.NUMBER_OF_FIELD_COMPONENTS))
+    file_id.write(' Do you want to specify another coord. system for dependent variables [N]? N\n')
+    if number_of_field_components == 2:
+        file_id.write(' The geometry is [1]:\n')
+        file_id.write('   (1) unsymmetric\n')
+        file_id.write('   (2) cylindrically symmetric about x (or r for cyl.polar)\n')
+        file_id.write('   (3) cylindrically symmetric about y (or z for cyl.polar)\n')
+        file_id.write('   (4) spherically   symmetric\n')
+        file_id.write('   (5) mirror symmetry in x\n')
+        file_id.write('   (6) mirror symmetry in y\n')
+        file_id.write('   (7) mirror symmetry in x and y\n')
+        file_id.write('    1\n')
+    file_id.write(' Enter x,y,z origin of coords relative to region 0 [0,0,0]:  0.00000E+00  0.00000E+00  0.00000E+00\n')
+    file_id.write(' Are there any non-standard mappings [N]? N\n')
+    file_id.close()
 
 def WriteCmCom(FIELD_VARIABLE,OUTPUT_FILENAME):
     FILE = open(OUTPUT_FILENAME + "CMISS.com", 'w')
@@ -794,6 +796,131 @@ fem export node;%s"%OUPUTINFO[-1] +" as %s"%OUPUTINFO[-1]+"\n\
 fem export elem;%s"%OUPUTINFO[-1] +" as %s"%OUPUTINFO[-1]+"\n\
 q\n"
     FILE.write(OUTPUT)
+    FILE.close()
+
+    FILE = open(OUPUTINFO[0] + '/para.ippara', 'w')
+    OUTPUT = \
+" CMISS Version 2.1  ippara File Version 1\n\
+ Heading:\n\
+ \n\
+ Max# auxiliary parameters          (NAM)[1]:         5\n\
+ Max# basis functions               (NBM)[1]:        42\n\
+ Max# var. types for a  dep. var.   (NCM)[1]:         2\n\
+ Max# data points                   (NDM)[1]:      6000\n\
+ Max# elements                      (NEM)[1]:     50000\n\
+ Max# elements in a region       (NE_R_M)[1]:     50000\n\
+ Max# adjacent elements in Xi      (NEIM)[1]:       500\n\
+ Max# global face segments          (NFM)[1]:       500\n\
+ Max# faces in a region          (NF_R_M)[1]:       500\n\
+ Max# local Voronoi faces         (NFVCM)[1]:         6\n\
+ Max# Gauss points per element      (NGM)[1]:        81\n\
+ Max# dependent variables           (NHM)[1]:         6\n\
+ Max# local Xi coordinates          (NIM)[1]:         3\n\
+ Max# global reference coordinates  (NJM)[1]:         6\n\
+ Max# derivatives per variable      (NKM)[1]:         8\n\
+ Max# global line segments          (NLM)[1]:      5000\n\
+ Max# lines in a region          (NL_R_M)[1]:      5000\n\
+ Max# material parameters           (NMM)[1]:        35\n\
+ Max# element nodes                 (NNM)[1]:        12\n\
+ Max# degrees of freedom            (NOM)[1]:      5000\n\
+ Max# global nodes                  (NPM)[1]:     50000\n\
+ Max# global nodes in a region   (NP_R_M)[1]:     50000\n\
+ Max# global grid points            (NQM)[1]:      4225\n\
+ Max# signal sets                  (NSSM)[1]:         1\n\
+ Max# grid degrees of freedom      (NYQM)[1]:         1\n\
+ Max# regions                       (NRM)[1]:         6\n\
+ Max# element dofs per variable     (NSM)[1]:        64\n\
+ Max# face dofs per variable       (NSFM)[1]:        16\n\
+ Max# eigenvalues                   (NTM)[1]:        20\n\
+ Max# time samples                 (NTSM)[1]:       200\n\
+ Max# derivatives up to 2nd order   (NUM)[1]:        11\n\
+ Max# Voronoi boundary nodes      (NVCBM)[1]:       100\n\
+ Max# Voronoi cells                (NVCM)[1]:       200\n\
+ Max# versions of a variable        (NVM)[1]:        16\n\
+ Max# workstations                  (NWM)[1]:         3\n\
+ Max# problem types                 (NXM)[1]:         3\n\
+ Max# mesh dofs                     (NYM)[1]:      5000\n\
+ Max# mesh dofs in a region      (NY_R_M)[1]:      5000\n\
+ Max# dimension of GD           (NZ_GD_M)[1]:   1202500\n\
+ Max# dimension of GK           (NZ_GK_M)[1]:   1491840\n\
+ Max# dimension of GKK         (NZ_GKK_M)[1]:   1491840\n\
+ Max# dimension of GM           (NZ_GM_M)[1]:   1202500\n\
+ Max# dimension of GMM         (NZ_GMM_M)[1]:   1202500\n\
+ Max# dimension of GQ           (NZ_GQ_M)[1]:   1202500\n\
+ Max# dimension of ISC_GD      (NISC_GDM)[1]:   1202500\n\
+ Max# dimension of ISR_GD      (NISR_GDM)[1]:      5000\n\
+ Max# dimension of ISC_GK      (NISC_GKM)[1]:   1491840\n\
+ Max# dimension of ISR_GK      (NISR_GKM)[1]:      5000\n\
+ Max# dimension of ISC_GKK    (NISC_GKKM)[1]:   1491840\n\
+ Max# dimension of ISR_GKK    (NISR_GKKM)[1]:      5000\n\
+ Max# dimension of ISC_GM      (NISC_GMM)[1]:   1202500\n\
+ Max# dimension of ISR_GM      (NISR_GMM)[1]:      5000\n\
+ Max# dimension of ISC_GMM    (NISC_GMMM)[1]:   1202500\n\
+ Max# dimension of ISR_GMM    (NISR_GMMM)[1]:      5000\n\
+ Max# dimension of ISC_GQ      (NISC_GQM)[1]:   1202500\n\
+ Max# dimension of ISR_GQ      (NISR_GQM)[1]:      5000\n\
+ Max# size of Minos arrays    (NZ_MINOSM)[1]:       125\n\
+ Max# basis function families      (NBFM)[1]:        13\n\
+ Max# nonlin. optim.n constraints  (NCOM)[1]:         0\n\
+ Max# data points in one element   (NDEM)[1]:      5000\n\
+ Max# dipoles in a region      (NDIPOLEM)[1]:        20\n\
+ Max# time points for a dipole (NDIPTIMM)[1]:       500\n\
+ Max# elements along a line        (NELM)[1]:        16\n\
+ Max# elements a node can be in    (NEPM)[1]:        20\n\
+ Max# segments                  (NGRSEGM)[1]:         6\n\
+ Max# variables per grid point     (NIQM)[1]:         6\n\
+ Max# cell state variables        (NIQSM)[1]:         0\n\
+ Max# variables for fibre extens(NIFEXTM)[1]:         8\n\
+ Max# variables per mesh dof       (NIYM)[1]:        16\n\
+ Max# variables / mesh dof(fix) (NIYFIXM)[1]:         5\n\
+ Max# vars. at each gauss point   (NIYGM)[1]:         6\n\
+ Max# vars. at face gauss points (NIYGFM)[1]:         0\n\
+ Max# linear optimis.n constraints (NLCM)[1]:         1\n\
+ Max# auxiliary grid parameters   (NMAQM)[1]:         6\n\
+ Max# cell material parameters     (NMQM)[1]:         0\n\
+ Max# optimisation variables       (NOPM)[1]:       125\n\
+ Max size fractal tree order array (NORM)[1]:        20\n\
+ Max# soln dofs for mesh dof       (NOYM)[1]:         1\n\
+ Max# domain nodes for BE problems (NPDM)[1]:         1\n\
+ Max# grid points per element      (NQEM)[1]:        81\n\
+ Max# non-zeros in grid matrix row (NQGM)[1]:        22\n\
+ Max# cell integer variables       (NQIM)[1]:         1\n\
+ Max# cell real variables          (NQRM)[1]:         1\n\
+ Max# spatial var cell int vars  (NQISVM)[1]:         1\n\
+ Max# spatial var cell real vars (NQRSVM)[1]:         1\n\
+ Max# number of grid schemes      (NQSCM)[1]:         9\n\
+ Max# cell variants                (NQVM)[1]:         0\n\
+ Max# rows and columns (sb 2)      (NRCM)[1]:         2\n\
+ Max# optimisation residuals       (NREM)[1]:       400\n\
+ Max# time points          (NTIMEPOINTSM)[1]:         1\n\
+ Max# time variables         (NTIMEVARSM)[1]:         1\n\
+ Max# mesh dofs for soln dof       (NYOM)[1]:         4\n\
+ Max# rows in a problem          (NYROWM)[1]:      5000\n\
+ Max image cell array dimension (NIMAGEM)[1]:         1\n\
+ Size of transfer matrix  (NY_TRANSFER_M)[1]:       200\n\
+ Max# mesh dofs map to 1 mesh dof  (NYYM)[1]:         0\n\
+ USE_BEM       (0 or 1)[1]: 1\n\
+ USE_CELL      (0 or 1)[1]: 0\n\
+ USE_DATA      (0 or 1)[1]: 1\n\
+ USE_DIPOLE    (0 or 1)[1]: 1\n\
+ USE_GAUSS_PT_MATERIALS  (0 or 1)[0]: 0\n\
+ USE_GRAPHICS  (0 or 1)[1]: 1\n\
+ USE_GRID      (0 or 1)[1]: 1\n\
+ USE_LUNG      (0 or 1)[1]: 1\n\
+ USE_MAGNETIC  (0 or 1)[0]: 0\n\
+ USE_MAPS      (0 or 1)[0]: 0\n\
+ USE_MINOS     (0 or 1)[1]: 0\n\
+ USE_NLSTRIPE  (0 or 1)[1]: 1\n\
+ USE_NONLIN    (0 or 1)[1]: 1\n\
+ USE_NPSOL     (0 or 1)[1]: 1\n\
+ USE_SPARSE    (0 or 1)[1]: 1\n\
+ USE_TRANSFER  (0 or 1)[1]: 1\n\
+ USE_TRIANGLE  (0 or 1)[1]: 0\n\
+ USE_VORONOI   (0 or 1)[1]: 0\n\
+ USE_TIME      (0 or 1)[1]: 1\n\
+\n"
+    FILE.write(OUTPUT)
+    FILE.close()
 
 def WriteCmguiCom(FIELD_VARIABLE,OUTPUT_FILENAME):
     FILE = open(OUTPUT_FILENAME + "CMGUI.com", 'w')
