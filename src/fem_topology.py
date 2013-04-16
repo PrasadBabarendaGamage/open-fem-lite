@@ -642,7 +642,13 @@ class Fields():
                     ELEMENT_VALUES[node_idx][derivative_idx] = self.FieldParameterSetNodeValueGet(FIELD_USER_NUMBER,FIELD_VARIABLE_USER_NUMBER,ELEMENT_NODE_VERSION,derivative_idx+1,MESH_ELEMENT_USER_NODES[node_idx],FIELD_COMPONENT_USER_NUMBER)
             return ELEMENT_VALUES
 
-
+    def FieldVersionFlagSet(self,FIELD_USER_NUMBER,FIELD_VARIABLE_USER_NUMBER, flag):
+        REGION = self.REGION
+        FIELD = self.FieldGlobalGet(FIELD_USER_NUMBER)
+        FIELD_VARIABLE = FIELD.FieldVariableGlobalGet(FIELD_VARIABLE_USER_NUMBER)
+        FIELD_COMPONENT = FIELD_VARIABLE.FieldComponentGlobalGet(1)
+        MESH_COMPONENT = FIELD_COMPONENT.MESH_COMPONENT
+        MESH_COMPONENT.NODES.MULTIPLE_VERSIONS = flag
 
 
 #============================================================================

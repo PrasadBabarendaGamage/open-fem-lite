@@ -225,15 +225,24 @@ def WriteIpElem(FIELD_VARIABLE,OUTPUT_FILENAME):
             OUTPUT = OUTPUT + " The basis function type for geometric variable %d is [1]:  1\n" %(component_idx+1)
         OUTPUT = OUTPUT + " Enter the %d global numbers for basis 1:" % BASIS.NUMBER_OF_NODES
         for node_idx in range(BASIS.NUMBER_OF_NODES):
-            OUTPUT = OUTPUT + " "+"%5d" %MESH_ELEMENT.USER_ELEMENT_NODES[node_idx]
-#        if Mesh.ELEMENTS[i-1].hasVersions:
-#            for k in range(0,len(Mesh.ELEMENTS[i-1].versionNodes)):
-#                output = output +\
-#"\n\
-# The version number for occurrence  1 of node "+"%5d" %Mesh.ELEMENTS[i-1].versionNodes[k] +", njj=1 is [ 1]: "+"%d" %Mesh.ELEMENTS[i-1].versionNodesNumber[k] +" \n\
-# The version number for occurrence  1 of node "+"%5d" %Mesh.ELEMENTS[i-1].versionNodes[k] +", njj=2 is [ 1]: "+"%d" %Mesh.ELEMENTS[i-1].versionNodesNumber[k] +" \n\
-# The version number for occurrence  1 of node "+"%5d" %Mesh.ELEMENTS[i-1].versionNodes[k] +", njj=3 is [ 1]: "+"%d" %Mesh.ELEMENTS[i-1].versionNodesNumber[k] +" "
-        OUTPUT = OUTPUT +" \n"
+            user_element_node_number = MESH_ELEMENT.USER_ELEMENT_NODES[node_idx]
+            OUTPUT = OUTPUT + " "+"%5d" %user_element_node_number
+        OUTPUT = OUTPUT + " \n"
+        if MESH_COMPONENT.NODES.MULTIPLE_VERSIONS:
+            for element_node_idx, user_element_node_number in enumerate(MESH_ELEMENT.USER_ELEMENT_NODES):
+                for component in range(1,NUMBER_OF_FIELD_COMPONENTS + 1):
+                    number_of_versions = 1
+                    FIELD_COMPONENT = FIELD_VARIABLE.FieldComponentGlobalGet(component)
+                    FIELD_NODE = FIELD_COMPONENT.FieldNodeGlobalGet(user_element_node_number)
+                    for MESH_NODE_DERIVATIVE_GLOBAL_NUMBER in range(FIELD_NODE.NUMBER_OF_DERIVATIVES):
+                        FIELD_NODE_DERIVATIVE = FIELD_NODE.DERIVATIVES[MESH_NODE_DERIVATIVE_GLOBAL_NUMBER]
+                        if FIELD_NODE_DERIVATIVE.NUMBER_OF_VERSIONS > number_of_versions:
+                            number_of_versions = FIELD_NODE_DERIVATIVE.NUMBER_OF_VERSIONS
+                    if number_of_versions > 1:
+                        #TODO:: currently version output only looks at the versions for node derivative = 1, generalize.
+                        OUTPUT = OUTPUT +\
+" The version number for occurrence  1 of node "+"%5d" %user_element_node_number +", njj=%d"%component +" is [ 1]: "+"%d" %MESH_ELEMENT.USER_ELEMENT_NODE_VERSIONS[element_node_idx][0] +" \n"
+   #     OUTPUT = OUTPUT +" \n"
     OUTPUT = OUTPUT + "\n"
 #    output = output + "\n"
     FILE.write(OUTPUT)
@@ -311,29 +320,42 @@ def WriteIpNode(FIELD_VARIABLE,OUTPUT_FILENAME):
         MESH_NODE_USER_NUMBER = MESH_NODE.USER_NUMBER
         OUTPUT = OUTPUT + " \n Node number ["+"%5d" %MESH_NODE_USER_NUMBER +"]: "+"%5d \n" %MESH_NODE_USER_NUMBER
         for component_idx in range(NUMBER_OF_FIELD_COMPONENTS):
+            number_of_versions = 1
             FIELD_COMPONENT = FIELD_VARIABLE.COMPONENTS[component_idx]
             FIELD_COMPONENT_USER_NUMBER = FIELD_COMPONENT.USER_NUMBER
-            FIELD_VERSION_USER_NUMBER = 1
-            DERIVATIVE_VALUES = []
-            for derivative_idx in range(NUMBER_OF_DERIVATIVES):
-                DERIVATIVE_VALUES.append(REGION.FIELDS.FieldParameterSetNodeValueGet(FIELD_USER_NUMBER,FIELD_VARIABLE_USER_NUMBER,FIELD_VERSION_USER_NUMBER,derivative_idx+1,MESH_NODE_USER_NUMBER,FIELD_COMPONENT_USER_NUMBER))
-            if NUMBER_OF_FIELD_COMPONENTS == 3:
-                OUTPUT = OUTPUT + " The Xj("+"%d" %(component_idx+1) +") coordinate is [ 0.00000E+00]: "+"%17.16e \n" %(DERIVATIVE_VALUES[0])
-                if (NUMBER_OF_DERIVATIVES == 4 or NUMBER_OF_DERIVATIVES == 8):
-                    OUTPUT = OUTPUT + " The derivative wrt direction 1 is [ 0.00000E+00]: "+"%17.16e \n" %(DERIVATIVE_VALUES[1])
-                    OUTPUT = OUTPUT + " The derivative wrt direction 2 is [ 0.00000E+00]: "+"%17.16e \n" %(DERIVATIVE_VALUES[2])
-                    OUTPUT = OUTPUT + " The derivative wrt directions 1 & 2 is [ 0.00000E+00]: "+"%17.16e \n" %(DERIVATIVE_VALUES[3])
-                    if NUMBER_OF_DERIVATIVES == 8:
-                        OUTPUT = OUTPUT + " The derivative wrt direction 3 is [ 0.00000E+00]: "+"%17.16e \n" %(DERIVATIVE_VALUES[4])
-                        OUTPUT = OUTPUT + " The derivative wrt directions 1 & 3 is [ 0.00000E+00]: "+"%17.16e \n" %(DERIVATIVE_VALUES[5])
-                        OUTPUT = OUTPUT + " The derivative wrt directions 2 & 3 is [ 0.00000E+00]: "+"%17.16e \n" %(DERIVATIVE_VALUES[6])
-                        OUTPUT = OUTPUT + " The derivative wrt directions 1, 2 & 3 is [ 0.00000E+00]: "+"%17.16e \n" %(DERIVATIVE_VALUES[7])
-            elif NUMBER_OF_FIELD_COMPONENTS == 2:
-                OUTPUT = OUTPUT + " The Xj("+"%d" %(component_idx+1) +") coordinate is [ 0.00000E+00]: "+"%17.16e \n" %(DERIVATIVE_VALUES[0])
-                if NUMBER_OF_DERIVATIVES == 4:
-                    OUTPUT = OUTPUT + " The derivative wrt direction 1 is [ 0.00000E+00]: "+"%17.16e \n" %(DERIVATIVE_VALUES[1])
-                    OUTPUT = OUTPUT + " The derivative wrt direction 2 is [ 0.00000E+00]: "+"%17.16e \n" %(DERIVATIVE_VALUES[2])
-                    OUTPUT = OUTPUT + " The derivative wrt directions 1 & 2 is [ 0.00000E+00]: "+"%17.16e \n" %(DERIVATIVE_VALUES[3])
+            if MESH_COMPONENT.NODES.MULTIPLE_VERSIONS == True:
+                FIELD_NODE = FIELD_COMPONENT.NODES[node_idx]
+                for MESH_NODE_DERIVATIVE_GLOBAL_NUMBER in range(MESH_NODE.NUMBER_OF_DERIVATIVES):
+                    FIELD_NODE_DERIVATIVE = FIELD_NODE.DERIVATIVES[MESH_NODE_DERIVATIVE_GLOBAL_NUMBER]
+                    if FIELD_NODE_DERIVATIVE.NUMBER_OF_VERSIONS > number_of_versions:
+                        number_of_versions = FIELD_NODE_DERIVATIVE.NUMBER_OF_VERSIONS
+                OUTPUT = OUTPUT + ' The number of versions for nj=%d is [1]:  %d \n' %(component_idx + 1, number_of_versions)
+
+            else:
+                number_of_versions = 1
+            for FIELD_VERSION_USER_NUMBER in range(1, number_of_versions + 1):
+                if number_of_versions > 1:
+                    OUTPUT = OUTPUT + ' For version number %d:\n'%(FIELD_VERSION_USER_NUMBER)
+                DERIVATIVE_VALUES = []
+                for derivative_idx in range(NUMBER_OF_DERIVATIVES):
+                    DERIVATIVE_VALUES.append(REGION.FIELDS.FieldParameterSetNodeValueGet(FIELD_USER_NUMBER,FIELD_VARIABLE_USER_NUMBER,FIELD_VERSION_USER_NUMBER,derivative_idx+1,MESH_NODE_USER_NUMBER,FIELD_COMPONENT_USER_NUMBER))
+                if NUMBER_OF_FIELD_COMPONENTS == 3:
+                    OUTPUT = OUTPUT + " The Xj("+"%d" %(component_idx+1) +") coordinate is [ 0.00000E+00]: "+"%17.16e \n" %(DERIVATIVE_VALUES[0])
+                    if (NUMBER_OF_DERIVATIVES == 4 or NUMBER_OF_DERIVATIVES == 8):
+                        OUTPUT = OUTPUT + " The derivative wrt direction 1 is [ 0.00000E+00]: "+"%17.16e \n" %(DERIVATIVE_VALUES[1])
+                        OUTPUT = OUTPUT + " The derivative wrt direction 2 is [ 0.00000E+00]: "+"%17.16e \n" %(DERIVATIVE_VALUES[2])
+                        OUTPUT = OUTPUT + " The derivative wrt directions 1 & 2 is [ 0.00000E+00]: "+"%17.16e \n" %(DERIVATIVE_VALUES[3])
+                        if NUMBER_OF_DERIVATIVES == 8:
+                            OUTPUT = OUTPUT + " The derivative wrt direction 3 is [ 0.00000E+00]: "+"%17.16e \n" %(DERIVATIVE_VALUES[4])
+                            OUTPUT = OUTPUT + " The derivative wrt directions 1 & 3 is [ 0.00000E+00]: "+"%17.16e \n" %(DERIVATIVE_VALUES[5])
+                            OUTPUT = OUTPUT + " The derivative wrt directions 2 & 3 is [ 0.00000E+00]: "+"%17.16e \n" %(DERIVATIVE_VALUES[6])
+                            OUTPUT = OUTPUT + " The derivative wrt directions 1, 2 & 3 is [ 0.00000E+00]: "+"%17.16e \n" %(DERIVATIVE_VALUES[7])
+                elif NUMBER_OF_FIELD_COMPONENTS == 2:
+                    OUTPUT = OUTPUT + " The Xj("+"%d" %(component_idx+1) +") coordinate is [ 0.00000E+00]: "+"%17.16e \n" %(DERIVATIVE_VALUES[0])
+                    if NUMBER_OF_DERIVATIVES == 4:
+                        OUTPUT = OUTPUT + " The derivative wrt direction 1 is [ 0.00000E+00]: "+"%17.16e \n" %(DERIVATIVE_VALUES[1])
+                        OUTPUT = OUTPUT + " The derivative wrt direction 2 is [ 0.00000E+00]: "+"%17.16e \n" %(DERIVATIVE_VALUES[2])
+                        OUTPUT = OUTPUT + " The derivative wrt directions 1 & 2 is [ 0.00000E+00]: "+"%17.16e \n" %(DERIVATIVE_VALUES[3])
     FILE.write(OUTPUT)
     FILE.close()
 
@@ -752,6 +774,8 @@ def WriteSingleIpBase(FIELD_VARIABLE,OUTPUT_FILENAME):
     FILE.close()
 
 def WriteIpCoor(FIELD_VARIABLE,OUTPUT_FILENAME):
+    FIELD_COMPONENT = FIELD_VARIABLE.FieldComponentGlobalGet(1)
+    MESH_COMPONENT = FIELD_COMPONENT.MESH_COMPONENT
     number_of_field_components = FIELD_VARIABLE.NUMBER_OF_FIELD_COMPONENTS
     file_id = open(OUTPUT_FILENAME + ".ipcoor", 'w')
     file_id.write(' CMISS Version 2.1  ipcoor File Version 1\n')
@@ -779,7 +803,13 @@ def WriteIpCoor(FIELD_VARIABLE,OUTPUT_FILENAME):
         file_id.write('   (7) mirror symmetry in x and y\n')
         file_id.write('    1\n')
     file_id.write(' Enter x,y,z origin of coords relative to region 0 [0,0,0]:  0.00000E+00  0.00000E+00  0.00000E+00\n')
-    file_id.write(' Are there any non-standard mappings [N]? N\n')
+    if MESH_COMPONENT.NODES.MULTIPLE_VERSIONS:
+        file_id.write(' Are there any non-standard mappings [N]? y\n')
+        file_id.write('    in versions to ensure C0 continuity [N]? y\n')
+        file_id.write('    in lines [N]? N\n')
+        file_id.write('    in degrees of freedom for hanging nodes [N]? N\n')
+    else:
+        file_id.write(' Are there any non-standard mappings [N]? N\n')
     file_id.close()
 
 def WriteCmCom(FIELD_VARIABLE,OUTPUT_FILENAME):
