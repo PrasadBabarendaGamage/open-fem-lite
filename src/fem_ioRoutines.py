@@ -498,7 +498,7 @@ def WriteIpBase(FIELD_VARIABLE,OUTPUT_FILENAME):
    (5) Calculated from arc length\n\
    (6) Calculated from arithmetic mean arc length\n\
    (7) Calculated from harmonic mean arc length\n\
-    6\n"
+    7\n"
     elif NUMBER_OF_DERIVATIVES == 8:
 
         OUTPUT = \
@@ -556,7 +556,7 @@ def WriteIpBase(FIELD_VARIABLE,OUTPUT_FILENAME):
    (5) Calculated from arc length\n\
    (6) Calculated from arithmetic mean arc length\n\
    (7) Calculated from harmonic mean arc length\n\
-    6\n\
+    7\n\
  For basis function type 2 the type of nodal interpolation is [1]:\n\
    (0) Auxiliary basis only\n\
    (1) Lagrange/Hermite tensor prod\n\
@@ -598,7 +598,7 @@ def WriteIpBase(FIELD_VARIABLE,OUTPUT_FILENAME):
    (5) Calculated from arc length\n\
    (6) Calculated from arithmetic mean arc length\n\
    (7) Calculated from harmonic mean arc length\n\
-    6\n"
+    7\n"
     FILE.write(OUTPUT)
     FILE.close()
 
@@ -711,7 +711,7 @@ def WriteSingleIpBase(FIELD_VARIABLE,OUTPUT_FILENAME):
    (5) Calculated from arc length\n\
    (6) Calculated from arithmetic mean arc length\n\
    (7) Calculated from harmonic mean arc length\n\
-    6\n"
+    7\n"
     elif NUMBER_OF_DERIVATIVES == 8:
 
         OUTPUT = \
@@ -769,7 +769,7 @@ def WriteSingleIpBase(FIELD_VARIABLE,OUTPUT_FILENAME):
    (5) Calculated from arc length\n\
    (6) Calculated from arithmetic mean arc length\n\
    (7) Calculated from harmonic mean arc length\n\
-    6\n"
+    7\n"
     FILE.write(OUTPUT)
     FILE.close()
 
@@ -1325,3 +1325,47 @@ def ReadIpMesh(REGION,BASIS_USER_NUMBER,MESH_USER_NUMBER,FIELD_USER_NUMBER,IPNOD
                             REGION.FIELDS.FieldParameterSetUpdateNode(FIELD_USER_NUMBER,FIELD_VARIABLE_USER_NUMBER,VERSION_NUMBER,derivative_idx+1,LOCAL_NODE_NUMBER,component_idx+1,VALUE)
                             line = line + 1
 
+def WriteIpMap(nodes, derivatives, output_filename):
+    number_of_components = 3
+    derivative_labels = (
+        [' Is the nodal position mapped out [N]? ',
+        ' Is the derivative wrt direction 1 is mapped out [N]? ',
+        ' Is the derivative wrt direction 2 is mapped out [N]? ',
+        ' Is the derivative wrt directions 1 & 2 is mapped out [N]? ',
+        ' Is the derivative wrt direction 3 is mapped out [N]? ',
+        ' Is the derivative wrt directions 1 & 3 is mapped out [N]? ',
+        ' Is the derivative wrt directions 2 & 3 is mapped out [N]? ',
+        ' Is the derivative wrt directions 1, 2 & 3 is mapped out [N]? '])
+    output = open(output_filename + '.ipmap', 'w')
+    output.write(' CMISS Version 2.0  ipmap File Version 1\n')
+    output.write(' Heading:\n')
+    output.write(' \n')
+    output.write(' Define node position mapping [N]? y\n')
+    output.write(' The number of nodes with special mappings is [    1]:     {0}\n'.format(len(nodes)))
+    output.write('\n')
+    for node in nodes:
+        output.write(' Node number [ {0}]:     {1}\n'.format(node,node))
+        for component in range(1,number_of_components+1):
+            output.write(' For the Xj({0}) coordinate:\n'.format(component))
+            output.write(' For version number 1:\n')
+            output.write(' Is the nodal position mapped out [N]? N\n')
+            output.write(' Is the derivative wrt direction 1 is mapped out [N]? N\n')
+            output.write(' Is the derivative wrt direction 2 is mapped out [N]? N\n')
+            output.write(' Is the derivative wrt directions 1 & 2 is mapped out [N]? N\n')
+            output.write(' Is the derivative wrt direction 3 is mapped out [N]? N\n')
+            output.write(' Is the derivative wrt directions 1 & 3 is mapped out [N]? N\n')
+            output.write(' Is the derivative wrt directions 2 & 3 is mapped out [N]? N\n')
+            output.write(' Is the derivative wrt directions 1, 2 & 3 is mapped out [N]? N\n')
+            output.write(' For version number 2:\n')
+
+            for derivative_idx, derivative in enumerate(range(1,9)):
+                if derivatives[derivative_idx] > 0:
+                    mapped = 'y'
+                else:
+                    mapped = 'n'
+                output.write(derivative_labels[derivative_idx] + mapped + '\n')
+                if mapped == 'y':
+                    output.write(' Enter node, version, direction, derivative numbers to map to [1,1,1,1]: {0} 1 {1} {2}\n'.format(node, component, derivative))
+                    output.write(' Enter the mapping coefficient [1]: 0.10000E+01\n')
+        output.write('\n')
+    output.close()
