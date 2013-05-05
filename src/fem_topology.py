@@ -155,6 +155,9 @@ class Region():
         DATAPOINT_GROUP = self.DATAPOINTS.DatapointGroupGlobalGet(DATA_POINT_GROUP_USER_NUMBER)
         fem_ioRoutines.WriteIpData(DATAPOINT_GROUP,OUTPUT_FILENAME,OUTPUT_GROUP_NAME)
 
+    def WriteIpMap(self, nodes, derivatives, output_filename):
+        fem_ioRoutines.WriteIpMap(nodes, derivatives, output_filename)
+
 class Regions():
     def __init__(self,):
         self.IDENTIFIER = "Region"
@@ -1236,6 +1239,16 @@ class NodeGroup():
         self.nodes = nodes
         self.bc = BoundaryCondition()
 
+    def nodes_add(self, nodes):
+        try:
+            number_of_nodes_to_add = len(nodes)
+        except: # Only a single node.  
+            self.numberOfNodes += 1
+            self.nodes.append(nodes)
+        else: # Multiple nodes.  
+            self.numberOfNodes = self.numberOfNodes + number_of_nodes_to_add
+            self.nodes = self.nodes + nodes
+
 class NodeGroups():
 
 
@@ -1253,6 +1266,14 @@ class NodeGroups():
         self.globalToLabelMap.append(label)
         self.nodeGroups.append(
             NodeGroup(userNumber, label, numberOfNodes, nodes))
+
+    def node_groups_add_nodes(self, userNumber, nodes):
+        nodeGroup = self.node_group_global_get(userNumber)
+        nodeGroup.nodes_add(nodes)
+
+    def node_groups_get_label(self, userNumber):
+        nodeGroup = self.node_group_global_get(userNumber)
+        return nodeGroup.label
 
     def node_group_global_get(self, userNumber):
         return self.nodeGroups[global_number_get(self, userNumber)]
@@ -1328,5 +1349,13 @@ class NodeGroups():
     def boundary_condition_add_label_order(self, labelOrder):
         # Selection between userNumber/label is automatically catered for.  
         self.bcNodeGroupLabelOrder = labelOrder
+
+    def bc_derivatives_set(self, userNumber, bc):
+        nodeGroup = self.node_group_global_get(userNumber)
+        nodeGroup.bc = bc
+
+    def bc_derivatives_get(self, userNumber):
+        nodeGroup = self.node_group_global_get(userNumber)
+        return nodeGroup.bc
 
 #============================================================================
