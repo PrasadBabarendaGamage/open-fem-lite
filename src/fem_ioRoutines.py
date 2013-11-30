@@ -814,21 +814,20 @@ def WriteIpCoor(FIELD_VARIABLE,OUTPUT_FILENAME):
 
 def WriteCmCom(FIELD_VARIABLE,OUTPUT_FILENAME):
     FILE = open(OUTPUT_FILENAME + "CMISS.com", 'w')
-    OUPUTINFO = OUTPUT_FILENAME.split("/")
+    output_info = OUTPUT_FILENAME.split("/")
     OUTPUT = \
 " \n\
 fem def para;r;para\n\
-fem def coor;r;%s"%OUPUTINFO[-1] +"\n\
-fem def base;r;%s"%OUPUTINFO[-1] +"\n\
-fem def node;r;%s"%OUPUTINFO[-1] +"\n\
-fem def elem;r;%s"%OUPUTINFO[-1] +"\n\
-fem export node;%s"%OUPUTINFO[-1] +" as %s"%OUPUTINFO[-1]+"\n\
-fem export elem;%s"%OUPUTINFO[-1] +" as %s"%OUPUTINFO[-1]+"\n\
+fem def coor;r;%s"%output_info[-1] +"\n\
+fem def base;r;%s"%output_info[-1] +"\n\
+fem def node;r;%s"%output_info[-1] +"\n\
+fem def elem;r;%s"%output_info[-1] +"\n\
+fem export node;%s"%output_info[-1] +" as %s"%output_info[-1]+"\n\
+fem export elem;%s"%output_info[-1] +" as %s"%output_info[-1]+"\n\
 q\n"
     FILE.write(OUTPUT)
     FILE.close()
-
-    FILE = open(OUPUTINFO[0] + '/para.ippara', 'w')
+    FILE = open('para.ippara', 'w')
     OUTPUT = \
 " CMISS Version 2.1  ippara File Version 1\n\
  Heading:\n\
@@ -840,8 +839,8 @@ q\n"
  Max# elements                      (NEM)[1]:     50000\n\
  Max# elements in a region       (NE_R_M)[1]:     50000\n\
  Max# adjacent elements in Xi      (NEIM)[1]:       500\n\
- Max# global face segments          (NFM)[1]:       500\n\
- Max# faces in a region          (NF_R_M)[1]:       500\n\
+ Max# global face segments          (NFM)[1]:       751\n\
+ Max# faces in a region          (NF_R_M)[1]:       751\n\
  Max# local Voronoi faces         (NFVCM)[1]:         6\n\
  Max# Gauss points per element      (NGM)[1]:        81\n\
  Max# dependent variables           (NHM)[1]:         6\n\
@@ -954,18 +953,18 @@ q\n"
 
 def WriteCmguiCom(FIELD_VARIABLE,OUTPUT_FILENAME):
     FILE = open(OUTPUT_FILENAME + "CMGUI.com", 'w')
-    OUPUTINFO = OUTPUT_FILENAME.split("/")
+    output_info = OUTPUT_FILENAME.split("/")
     OUTPUT = \
 " \n\
-gfx r n %s"%OUPUTINFO[-1] +".exnode\n\
-gfx r e %s"%OUPUTINFO[-1] +".exelem\n\
+gfx r n %s"%output_info[-1] +".exnode\n\
+gfx r e %s"%output_info[-1] +".exelem\n\
 \n"
     FILE.write(OUTPUT)
     FILE.close()
 
 def WriteIpData(DATAPOINT_GROUP,OUTPUT_FILENAME,OUTPUT_GROUP_NAME):
     FILE = open(OUTPUT_FILENAME + ".ipdata", 'w')
-    OUPUTINFO = OUTPUT_FILENAME.split("/")
+    output_info = OUTPUT_FILENAME.split("/")
     OUTPUT =OUTPUT_GROUP_NAME+"\n"
     for nd in range(DATAPOINT_GROUP.NUMBER_OF_DATAPOINTS):
         DATAPOINT = DATAPOINT_GROUP.DATAPOINTS[nd]
