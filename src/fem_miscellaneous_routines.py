@@ -90,3 +90,12 @@ def CMISS_intStringToArray(String):
 		else:
 			Data.append(int(value))
 	return Data
+
+def indexOfNthOccurrence(N, element, stream):
+    """for N>0, returns index or None"""
+    seen = 0
+    for i,x in enumerate(stream):
+        if x==element:
+            seen += 1
+            if seen==N:
+                return i
