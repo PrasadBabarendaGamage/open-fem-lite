@@ -241,7 +241,7 @@ def WriteIpElem(FIELD_VARIABLE,OUTPUT_FILENAME):
                     if number_of_versions > 1:
                         #TODO:: currently version output only looks at the versions for node derivative = 1, generalize.
                         OUTPUT = OUTPUT +\
-" The version number for occurrence  1 of node "+"%5d" %user_element_node_number +", njj=%d"%component +" is [ 1]: "+"%d" %MESH_ELEMENT.USER_ELEMENT_NODE_VERSIONS[element_node_idx][0] +" \n"
+" The version number for occurrence  1 of node "+"%5d" %user_element_node_number +", njj=%d"%component +" is [ 1]: "+"%d" %MESH_ELEMENT.COMPONENTS[component-1].USER_ELEMENT_NODE_VERSIONS[element_node_idx][0] +" \n"
    #     OUTPUT = OUTPUT +" \n"
     OUTPUT = OUTPUT + "\n"
 #    output = output + "\n"
@@ -325,7 +325,7 @@ def WriteIpNode(FIELD_VARIABLE,OUTPUT_FILENAME):
             FIELD_COMPONENT_USER_NUMBER = FIELD_COMPONENT.USER_NUMBER
             if MESH_COMPONENT.NODES.MULTIPLE_VERSIONS == True:
                 FIELD_NODE = FIELD_COMPONENT.NODES[node_idx]
-                for MESH_NODE_DERIVATIVE_GLOBAL_NUMBER in range(MESH_NODE.NUMBER_OF_DERIVATIVES):
+                for MESH_NODE_DERIVATIVE_GLOBAL_NUMBER in range(MESH_NODE.COMPONENTS[component_idx].NUMBER_OF_DERIVATIVES):
                     FIELD_NODE_DERIVATIVE = FIELD_NODE.DERIVATIVES[MESH_NODE_DERIVATIVE_GLOBAL_NUMBER]
                     if FIELD_NODE_DERIVATIVE.NUMBER_OF_VERSIONS > number_of_versions:
                         number_of_versions = FIELD_NODE_DERIVATIVE.NUMBER_OF_VERSIONS
@@ -360,21 +360,30 @@ def WriteIpNode(FIELD_VARIABLE,OUTPUT_FILENAME):
     FILE.close()
 
 def WriteIpBase(FIELD_VARIABLE,OUTPUT_FILENAME):
+
+    # Note that different bases for different field components, while
+    # supported in cm, is not support in this export function.
+
     REGION = FIELD_VARIABLE.REGION
     FIELD_VARIABLE_USER_NUMBER = FIELD_VARIABLE.USER_NUMBER
     FIELD = FIELD_VARIABLE.FIELD
     FIELD_USER_NUMBER = FIELD.USER_NUMBER
-    FIELD_COMPONENT = FIELD_VARIABLE.FieldComponentGlobalGet(1)
+    FIELD_COMPONENT = FIELD_VARIABLE.FieldComponentGlobalGet(1) #Default to first field component
     MESH_COMPONENT = FIELD_COMPONENT.MESH_COMPONENT
+    MESH_ELEMENTS = MESH_COMPONENT.ELEMENTS
+    MESH_ELEMENT = MESH_ELEMENTS.MeshElementGlobalGet(1) #Default to first mesh component
+    BASIS = MESH_ELEMENT.BASIS
+
     NUMBER_OF_NODES = MESH_COMPONENT.NODES.NUMBER_OF_NODES
     NUMBER_OF_FIELD_COMPONENTS = FIELD_VARIABLE.NUMBER_OF_FIELD_COMPONENTS
     NUMBER_OF_DERIVATIVES = MESH_COMPONENT.NODES.BASIS_MAX_NUMBER_OF_DERIVATIVES
     FILE = open(OUTPUT_FILENAME + ".ipbase", 'w')
 
+    print NUMBER_OF_DERIVATIVES
+
     if NUMBER_OF_DERIVATIVES == 1:
         OUTPUT = \
 " CMISS Version 1.21 ipbase File Version 2\n\
- Heading: 10% uniaxial extension of a unit cube\n\
  \n\
  Enter the number of types of basis function [1]: 2\n\
  \n\
@@ -450,8 +459,19 @@ def WriteIpBase(FIELD_VARIABLE,OUTPUT_FILENAME):
  Enter the number of Gauss points in the Xi(2) direction [2]: 2\n\
  Enter the node position indices [11211222]: 1 1 2 1 1 2 2 2\n\
  Enter the number of auxiliary element parameters [0]: 0\n"
-    elif NUMBER_OF_DERIVATIVES == 4:
-        OUTPUT = \
+
+    else:
+        if BASIS.scaling_type is 'harmonic':
+            scaling = 7
+        elif BASIS.scaling_type is 'geometric':
+            raise Exception('Geometric field scaling not implemented in cm')
+        elif BASIS.scaling_type is 'arithmetic':
+            scaling = 6
+        else:
+            raise Exception('Unknown field scaling used')
+
+        if NUMBER_OF_DERIVATIVES == 4:
+            OUTPUT = \
 " CMISS Version 1.21 ipbase File Version 2\n\
  Heading: cmgui generated file\n\
 \n\
@@ -498,10 +518,11 @@ def WriteIpBase(FIELD_VARIABLE,OUTPUT_FILENAME):
    (5) Calculated from arc length\n\
    (6) Calculated from arithmetic mean arc length\n\
    (7) Calculated from harmonic mean arc length\n\
-    7\n"
-    elif NUMBER_OF_DERIVATIVES == 8:
+    {0}\n".format(scaling)
 
-        OUTPUT = \
+        elif NUMBER_OF_DERIVATIVES == 8:
+
+           OUTPUT = \
 " CMISS Version 1.21 ipbase File Version 2\n\
  Heading: cmgui generated file\n\
 \n\
@@ -598,7 +619,7 @@ def WriteIpBase(FIELD_VARIABLE,OUTPUT_FILENAME):
    (5) Calculated from arc length\n\
    (6) Calculated from arithmetic mean arc length\n\
    (7) Calculated from harmonic mean arc length\n\
-    7\n"
+    {0}\n".format(scaling)
     FILE.write(OUTPUT)
     FILE.close()
 
@@ -1229,24 +1250,36 @@ def ReadIpMesh(REGION,BASIS_USER_NUMBER,MESH_USER_NUMBER,FIELD_USER_NUMBER,IPNOD
 
     #Loop through and read element node numbers
     for line in range(len(IPELEM_LINES)):
+        
         if IPELEM_LINES[line][0:16] == " Element number ":
             LOCAL_ELEMENT_NUMBER = int(IPELEM_LINES[line].split()[-1])
             ELEMENT_NODES = [int(values) for values in IPELEM_LINES[line+BASIS.NUMBER_OF_XIC+2].split()[8:8+BASIS.NUMBER_OF_NODES]]
+            if DEBUG==True: print "Element Number:{0}, element nodes: {1}".format(LOCAL_ELEMENT_NUMBER,ELEMENT_NODES)
             REGION.MESHES.MeshElementsNodesSet(MESH_USER_NUMBER,MESH_COMPONENT_NUMBER,LOCAL_ELEMENT_NUMBER,ELEMENT_NODES)
-            BASIS.NUMBER_OF_NODES
             line = line + 1 + BASIS.NUMBER_OF_XIC+2
-            VERSION_NUMBER = 1
-            for node_idx in range(BASIS.NUMBER_OF_NODES):
-                for derivative_idx in range(BASIS.NUMBER_OF_PARTIAL_DERIVATIVES):
-                    REGION.MESHES.MeshElementsNodeVersionSet(MESH_USER_NUMBER,MESH_COMPONENT_NUMBER,LOCAL_ELEMENT_NUMBER,node_idx+1,derivative_idx+1,VERSION_NUMBER) 
             while IPELEM_LINES[line][0:12] == " The version":
                 VERSION_NUMBER = int(IPELEM_LINES[line].split()[-1])
                 LOCAL_NODE_NUMBER = int(IPELEM_LINES[line].split()[8].rstrip(","))
-                node_idx = ELEMENT_NODES.index(LOCAL_NODE_NUMBER)
+                occurrence=int(IPELEM_LINES[line].split()[5])
+                component=int(IPELEM_LINES[line].split()[9].split('=')[-1])
+                element_node_idx = fem_miscellaneous_routines.indexOfNthOccurrence(occurrence, LOCAL_NODE_NUMBER, ELEMENT_NODES)
                 for derivative_idx in range(BASIS.NUMBER_OF_PARTIAL_DERIVATIVES):
-                    REGION.MESHES.MeshElementsNodeVersionSet(MESH_USER_NUMBER,MESH_COMPONENT_NUMBER,LOCAL_ELEMENT_NUMBER,node_idx+1,derivative_idx+1,VERSION_NUMBER) 
-                    #GlobalElementNumber,NodeIndex,DerivativeNumber,VersionNumber
-                line = line + 3
+                    REGION.MESHES.MeshElementsNodeVersionSet(MESH_USER_NUMBER,MESH_COMPONENT_NUMBER,LOCAL_ELEMENT_NUMBER,element_node_idx+1,derivative_idx+1,VERSION_NUMBER,component) 
+                line +=1
+#            line = line + 1 + BASIS.NUMBER_OF_XIC+2
+#            VERSION_NUMBER = 1
+#            for node_idx in range(BASIS.NUMBER_OF_NODES):
+#                for derivative_idx in range(BASIS.NUMBER_OF_PARTIAL_DERIVATIVES):
+#                    REGION.MESHES.MeshElementsNodeVersionSet(MESH_USER_NUMBER,MESH_COMPONENT_NUMBER,LOCAL_ELEMENT_NUMBER,node_idx+1,derivative_idx+1,VERSION_NUMBER) 
+#            while IPELEM_LINES[line][0:12] == " The version":
+#                VERSION_NUMBER = int(IPELEM_LINES[line].split()[-1])
+#                LOCAL_NODE_NUMBER = int(IPELEM_LINES[line].split()[8].rstrip(","))
+#                if DEBUG==True: print "Local Node Number:{0}, version number: {1}".format(LOCAL_NODE_NUMBER,VERSION_NUMBER)
+#                node_idx = ELEMENT_NODES.index(LOCAL_NODE_NUMBER)
+#                for derivative_idx in range(BASIS.NUMBER_OF_PARTIAL_DERIVATIVES):
+#                    REGION.MESHES.MeshElementsNodeVersionSet(MESH_USER_NUMBER,MESH_COMPONENT_NUMBER,LOCAL_ELEMENT_NUMBER,node_idx+1,derivative_idx+1,VERSION_NUMBER) 
+#                    #GlobalElementNumber,NodeIndex,DerivativeNumber,VersionNumber
+#                line = line + 3
 
     REGION.MESHES.MeshElementsCreateFinish(MESH_USER_NUMBER,MESH_COMPONENT_NUMBER)
     REGION.MESHES.MeshesCreateFinish(MESH_USER_NUMBER)
@@ -1285,7 +1318,7 @@ def ReadIpMesh(REGION,BASIS_USER_NUMBER,MESH_USER_NUMBER,FIELD_USER_NUMBER,IPNOD
                     line = line + 1
                 for component_idx in range(BASIS.NUMBER_OF_XIC):
                     if COMPONENT_VERSIONS_PRESENT[component_idx] == True:
-                        NUMBER_OF_VERSIONS = int(IPNODE_LINES[line].split()[-1])
+                        NUMBER_OF_VERSIONS = int(IPNODE_LINES[line].split()[-1].rstrip())
                         if NUMBER_OF_VERSIONS > 1:
                             line = line + 1
                     else:

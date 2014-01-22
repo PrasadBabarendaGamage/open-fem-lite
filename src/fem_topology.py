@@ -217,6 +217,7 @@ class Basis():
         self.NUMBER_OF_NODES = 0
         self.NUMBER_OF_PARTIAL_DERIVATIVES = 0
         self.NUMBER_OF_ELEMENT_PARAMETERS = 0
+        self.scaling_type = 'harmonic'
 
 class Bases():
     def __init__(self,REGION):
@@ -250,6 +251,10 @@ class Bases():
     def BasisTypeSet(self,USER_NUMBER,TYPE):
         BASIS = self.BasisGlobalGet(USER_NUMBER)
         BASIS.TYPE = TYPE
+
+    def BasisScalingTypeSet(self,USER_NUMBER,TYPE):
+        BASIS = self.BasisGlobalGet(USER_NUMBER)
+        BASIS.scaling_type = TYPE
 
     def BasisNumberOfXiCoordinatesSet(self,USER_NUMBER,NUMBER_OF_XIC):
         BASIS = self.BasisGlobalGet(USER_NUMBER)
@@ -546,8 +551,9 @@ class Fields():
                     FIELD_COMPONENT.NUMBER_OF_NODES = FIELD_COMPONENT.NUMBER_OF_NODES + 1
                     FIELD_COMPONENT.NODES.append(FieldNode(FIELD_NODE_USER_NUMBER,REGION))
                     FIELD_NODE = FIELD_COMPONENT.NODES[MESH_NODE_GLOBAL_NUMBER]
-                    for MESH_NODE_DERIVATIVE_GLOBAL_NUMBER in range(MESH_NODE.NUMBER_OF_DERIVATIVES):
-                        MESH_NODE_DERIVATIVE = MESH_NODE.DERIVATIVES[MESH_NODE_DERIVATIVE_GLOBAL_NUMBER]
+                    MESH_NODE_COMPONENT = MESH_NODE.COMPONENTS[FIELD_COMPONENT_GLOBAL_NUMBER]
+                    for MESH_NODE_DERIVATIVE_GLOBAL_NUMBER in range(MESH_NODE_COMPONENT.NUMBER_OF_DERIVATIVES):
+                        MESH_NODE_DERIVATIVE = MESH_NODE_COMPONENT.DERIVATIVES[MESH_NODE_DERIVATIVE_GLOBAL_NUMBER]
                         FIELD_NODE_DERIVATIVE_USER_NUMBER = MESH_NODE_DERIVATIVE.USER_NUMBER
                         FIELD_NODE.NUMBER_OF_DERIVATIVES = FIELD_NODE.NUMBER_OF_DERIVATIVES + 1
                         FIELD_NODE.globalToUserMap.append(FIELD_NODE_DERIVATIVE_USER_NUMBER)
@@ -811,7 +817,8 @@ class Meshes():
         ELEMENT.USER_ELEMENT_NODES = ELEMENT_NODES
         #Initialize element node versions
         BASIS = ELEMENT.BASIS
-        ELEMENT.USER_ELEMENT_NODE_VERSIONS = fem_miscellaneous_routines.initialize2DList(1,BASIS.NUMBER_OF_NODES,BASIS.NUMBER_OF_PARTIAL_DERIVATIVES)
+        for component_idx in range(ELEMENT.NUMBER_OF_COMPONENTS):
+            ELEMENT.COMPONENTS[component_idx].USER_ELEMENT_NODE_VERSIONS = fem_miscellaneous_routines.initialize2DList(1,BASIS.NUMBER_OF_NODES,BASIS.NUMBER_OF_PARTIAL_DERIVATIVES)
 
 #    def MeshElementNumberUpdate(self,MESH_USER_NUMBER,MESH_COMPONENT_NUMBER,ORIGINAL_ELEMENT_USER_NUMBER,UPDATED_ELEMENT_USER_NUMBER):
 #        MESH = self.MeshGlobalGet(MESH_USER_NUMBER)
@@ -830,7 +837,7 @@ class Meshes():
         ELEMENT = MESH_COMPONENT.ELEMENTS.ELEMENTS[GLOBAL_ELEMENT_NUMBER]
         return ELEMENT.USER_ELEMENT_NODES
 
-    def MeshElementsNodeVersionSet(self,MESH_USER_NUMBER,MESH_COMPONENT_NUMBER,ELEMENT_USER_NUMBER,ELEMENT_NODE_NUMBER,DERIVATIVE_NUMBER,VERSION_NUMBER):
+    def MeshElementsNodeVersionSet(self,MESH_USER_NUMBER,MESH_COMPONENT_NUMBER,ELEMENT_USER_NUMBER,ELEMENT_NODE_NUMBER,DERIVATIVE_NUMBER,VERSION_NUMBER,COMPONENT_NUMBER):
         MESH = self.MeshGlobalGet(MESH_USER_NUMBER)
         GLOBAL_MESH_COMPONENT_NUMBER = MESH.MeshTopologyGlobalComponentNumberGet(MESH_COMPONENT_NUMBER)
         MESH_COMPONENT = MESH.TOPOLOGY[GLOBAL_MESH_COMPONENT_NUMBER]
@@ -839,15 +846,15 @@ class Meshes():
         #print ELEMENT.USER_ELEMENT_NODE_VERSIONS
         #print DERIVATIVE_NUMBER
         #print ELEMENT_NODE_NUMBER
-        ELEMENT.USER_ELEMENT_NODE_VERSIONS[ELEMENT_NODE_NUMBER-1][DERIVATIVE_NUMBER-1] = VERSION_NUMBER
+        ELEMENT.COMPONENTS[COMPONENT_NUMBER-1].USER_ELEMENT_NODE_VERSIONS[ELEMENT_NODE_NUMBER-1][DERIVATIVE_NUMBER-1] = VERSION_NUMBER
 
-    def MeshElementsNodeVersionGet(self,MESH_USER_NUMBER,MESH_COMPONENT_NUMBER,ELEMENT_USER_NUMBER,ELEMENT_NODE_NUMBER,DERIVATIVE_NUMBER):
+    def MeshElementsNodeVersionGet(self,MESH_USER_NUMBER,MESH_COMPONENT_NUMBER,ELEMENT_USER_NUMBER,ELEMENT_NODE_NUMBER,DERIVATIVE_NUMBER,COMPONENT_NUMBER):
         MESH = self.MeshGlobalGet(MESH_USER_NUMBER)
         GLOBAL_MESH_COMPONENT_NUMBER = MESH.MeshTopologyGlobalComponentNumberGet(MESH_COMPONENT_NUMBER)
         MESH_COMPONENT = MESH.TOPOLOGY[GLOBAL_MESH_COMPONENT_NUMBER]
         GLOBAL_ELEMENT_NUMBER = MESH_COMPONENT.ELEMENTS.MeshElementglobal_number_get(ELEMENT_USER_NUMBER)
         ELEMENT = MESH_COMPONENT.ELEMENTS.ELEMENTS[GLOBAL_ELEMENT_NUMBER]
-        return ELEMENT.USER_ELEMENT_NODE_VERSIONS[ELEMENT_NODE_NUMBER-1][DERIVATIVE_NUMBER-1]
+        return ELEMENT.COMPONENTS[COMPONENT_NUMBER-1].USER_ELEMENT_NODE_VERSIONS[ELEMENT_NODE_NUMBER-1][DERIVATIVE_NUMBER-1]
 
     def MeshElementsListGet(self,MESH_USER_NUMBER,MESH_COMPONENT_NUMBER):
         MESH = self.MeshGlobalGet(MESH_USER_NUMBER)
@@ -884,37 +891,42 @@ class Meshes():
             MESH_NODES.globalToUserMap.append(MESH_NODE_USER_NUMBER)
             #Automatically allocate the number of derivatives of the basis to each node
             MESH_NODE = MESH_NODES.NODES[-1]
-            for global_derivative_idx in range(BASIS_MAX_NUMBER_OF_DERIVATIVES):
-                MESH_NODE_DERIVATIVE_USER_NUMBER = global_derivative_idx+1
-                MESH_NODE.NUMBER_OF_DERIVATIVES = MESH_NODE.NUMBER_OF_DERIVATIVES + 1
-                MESH_NODE.DERIVATIVES.append(MeshNodeDerivative(MESH_NODE_DERIVATIVE_USER_NUMBER,REGION,MESH_COMPONENT))
-                MESH_NODE.globalToUserMap.append(MESH_NODE_DERIVATIVE_USER_NUMBER)
+            for component_idx in range(3):
+                #MESH_NODE_COMPONENT_USER_NUMBER = component_idx+1 #Not used yet
+                MESH_NODE_COMPONENTS = MESH_NODE.COMPONENTS[component_idx]
+                for global_derivative_idx in range(BASIS_MAX_NUMBER_OF_DERIVATIVES):
+                    MESH_NODE_COMPONENT_DERIVATIVE_USER_NUMBER = global_derivative_idx+1
+                    MESH_NODE_COMPONENTS.NUMBER_OF_DERIVATIVES = MESH_NODE_COMPONENTS.NUMBER_OF_DERIVATIVES + 1
+                    MESH_NODE_COMPONENTS.DERIVATIVES.append(MeshNodeDerivative(MESH_NODE_COMPONENT_DERIVATIVE_USER_NUMBER,REGION,MESH_COMPONENT))
+                    MESH_NODE_COMPONENTS.globalToUserMap.append(MESH_NODE_COMPONENT_DERIVATIVE_USER_NUMBER)
 
         #Loop through and find and allocate number of versions for each node derivative
         for global_mesh_node_idx in range(MESH_NODES.NUMBER_OF_NODES):
             MESH_NODE = MESH_NODES.NODES[global_mesh_node_idx]
             MESH_NODE_USER_NUMBER = MESH_NODE.USER_NUMBER
-            for global_element_idx in range(MESH.NUMBER_OF_ELEMENTS):
-                ELEMENT = MESH_COMPONENT.ELEMENTS.ELEMENTS[global_element_idx]
-                USER_ELEMENT_NODE_VERSIONS=ELEMENT.USER_ELEMENT_NODE_VERSIONS
-                BASIS_NUMBER_OF_ELEMENT_NODES = len(ELEMENT.USER_ELEMENT_NODES)
-                for element_node_idx in range(BASIS_NUMBER_OF_ELEMENT_NODES):
-                    ELEMENT_NODE_USER_NUMBER = ELEMENT.USER_ELEMENT_NODES[element_node_idx]
-                    if MESH_NODE_USER_NUMBER == ELEMENT_NODE_USER_NUMBER:
-                        for global_derivative_idx in range(BASIS_MAX_NUMBER_OF_DERIVATIVES):
-                            MESH_NODE_DERIVATIVE = MESH_NODE.DERIVATIVES[global_derivative_idx]
-                            MESH_NODE_DERIVATIVE_USER_NUMBER = MESH_NODE_DERIVATIVE.USER_NUMBER
-                            MESH_NODE_DERIVATIVE_VERSION_USER_NUMBER = USER_ELEMENT_NODE_VERSIONS[element_node_idx][global_derivative_idx]
-                            try:
-                                MESH_NODE_DERIVATIVE.globalToUserMap.index(MESH_NODE_DERIVATIVE_VERSION_USER_NUMBER)
-                            except ValueError:
-                                MESH_NODE_DERIVATIVE.NUMBER_OF_VERSIONS = MESH_NODE_DERIVATIVE.NUMBER_OF_VERSIONS + 1
-                                MESH_NODE_DERIVATIVE.VERSIONS.append(MeshNodeDerivativeVersion(MESH_NODE_DERIVATIVE_VERSION_USER_NUMBER,REGION,MESH_COMPONENT))
-                                MESH_NODE_DERIVATIVE.globalToUserMap.append(MESH_NODE_DERIVATIVE_VERSION_USER_NUMBER)
-                                if MESH_NODE_DERIVATIVE.NUMBER_OF_VERSIONS>1:
-                                    MESH_NODE.MULTIPLE_VERSIONS = True
-            if MESH_NODE.MULTIPLE_VERSIONS==True:
-                MESH_NODES.MULTIPLE_VERSIONS = True
+            for component_idx in range(3):
+                MESH_NODE_COMPONENTS = MESH_NODE.COMPONENTS[component_idx]
+                for global_element_idx in range(MESH.NUMBER_OF_ELEMENTS):
+                    ELEMENT = MESH_COMPONENT.ELEMENTS.ELEMENTS[global_element_idx]
+                    USER_ELEMENT_NODE_COMPONENT_VERSIONS=ELEMENT.COMPONENTS[component_idx].USER_ELEMENT_NODE_VERSIONS
+                    BASIS_NUMBER_OF_ELEMENT_NODES = len(ELEMENT.USER_ELEMENT_NODES)
+                    for element_node_idx in range(BASIS_NUMBER_OF_ELEMENT_NODES):
+                        ELEMENT_NODE_USER_NUMBER = ELEMENT.USER_ELEMENT_NODES[element_node_idx]
+                        if MESH_NODE_USER_NUMBER == ELEMENT_NODE_USER_NUMBER:
+                            for global_derivative_idx in range(BASIS_MAX_NUMBER_OF_DERIVATIVES):
+                                MESH_NODE_COMPONENTS_DERIVATIVE = MESH_NODE_COMPONENTS.DERIVATIVES[global_derivative_idx]
+                                MESH_NODE_DERIVATIVE_USER_NUMBER = MESH_NODE_COMPONENTS_DERIVATIVE.USER_NUMBER
+                                MESH_NODE_DERIVATIVE_VERSION_USER_NUMBER = USER_ELEMENT_NODE_COMPONENT_VERSIONS[element_node_idx][global_derivative_idx]
+                                try:
+                                    MESH_NODE_COMPONENTS_DERIVATIVE.globalToUserMap.index(MESH_NODE_DERIVATIVE_VERSION_USER_NUMBER)
+                                except ValueError:
+                                    MESH_NODE_COMPONENTS_DERIVATIVE.NUMBER_OF_VERSIONS += 1
+                                    MESH_NODE_COMPONENTS_DERIVATIVE.VERSIONS.append(MeshNodeDerivativeVersion(MESH_NODE_DERIVATIVE_VERSION_USER_NUMBER,REGION,MESH_COMPONENT))
+                                    MESH_NODE_COMPONENTS_DERIVATIVE.globalToUserMap.append(MESH_NODE_DERIVATIVE_VERSION_USER_NUMBER)
+                                    if MESH_NODE_COMPONENTS_DERIVATIVE.NUMBER_OF_VERSIONS>1:
+                                        MESH_NODE_COMPONENTS.MULTIPLE_VERSIONS = True
+                if MESH_NODE_COMPONENTS.MULTIPLE_VERSIONS==True:
+                    MESH_NODES.MULTIPLE_VERSIONS = True
         MESH.FINISHED = True
                     
     def MeshElementsCreateFinish(self,MESH_USER_NUMBER,MESH_COMPONENT_NUMBER):
@@ -942,13 +954,23 @@ class MeshTopology():
         self.ELEMENTS = MeshElements(REGION,MESH,self)
         self.NODES = MeshNodes(REGION,MESH,self)
 
+class MeshElementVersions():
+    def __init__(self,USER_NUMBER):
+        self.USER_NUMBER = USER_NUMBER #!<The user number of a mesh element. The user number must be unique.
+        self.USER_ELEMENT_NODE_VERSIONS = []
+
 class MeshElement():
     def __init__(self,USER_NUMBER,REGION):
         self.USER_NUMBER = USER_NUMBER #!<The user number of a mesh element. The user number must be unique.
         self.REGION = REGION
         self.BASIS = []
         self.USER_ELEMENT_NODES = []
-        self.USER_ELEMENT_NODE_VERSIONS = []
+        #self.USER_ELEMENT_NODE_VERSIONS = []
+        self.NUMBER_OF_COMPONENTS = 3
+        self.globalToUserMap = []
+        self.COMPONENTS=[]
+        for component_idx in range(self.NUMBER_OF_COMPONENTS):
+            self.COMPONENTS.append(MeshElementVersions(component_idx+1))
 
 class MeshElements():
     def __init__(self,REGION,MESH,TOPOLOGY):
@@ -984,7 +1006,7 @@ class MeshNodeDerivative():
         self.globalToUserMap = []
         self.VERSIONS = []
 
-class MeshNode():
+class MeshNodeComponent():
     def __init__(self,USER_NUMBER,REGION,TOPOLOGY):
         self.USER_NUMBER = USER_NUMBER #!<The user number of a mesh node. The user number must be unique.
         self.REGION = REGION
@@ -993,6 +1015,17 @@ class MeshNode():
         self.globalToUserMap = []
         self.DERIVATIVES = []
         self.MULTIPLE_VERSIONS = False
+
+class MeshNode():
+    def __init__(self,USER_NUMBER,REGION,TOPOLOGY):
+        self.USER_NUMBER = USER_NUMBER #!<The user number of a mesh node. The user number must be unique.
+        self.REGION = REGION
+        self.TOPOLOGY = TOPOLOGY
+        self.NUMBER_OF_COMPONENTS = 3
+        self.globalToUserMap = []
+        self.COMPONENTS = []
+        for component_idx in range(self.NUMBER_OF_COMPONENTS):
+            self.COMPONENTS.append(MeshNodeComponent(component_idx+1,REGION,TOPOLOGY))
 
 class MeshNodes():
     def __init__(self,REGION,MESH,TOPOLOGY):
