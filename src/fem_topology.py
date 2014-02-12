@@ -634,7 +634,7 @@ class Fields():
         ELEMENT_VALUES = fem_miscellaneous_routines.initialize2DList(float(0.0),BASIS.NUMBER_OF_NODES,BASIS.NUMBER_OF_PARTIAL_DERIVATIVES)
         for node_idx in range(BASIS.NUMBER_OF_NODES):
             for derivative_idx in range(BASIS.NUMBER_OF_PARTIAL_DERIVATIVES):
-                ELEMENT_NODE_VERSION = REGION.MESHES.MeshElementsNodeVersionGet(MESH_USER_NUMBER,MESH_COMPONENT_USER_NUMBER,ELEMENT_USER_NUMBER,node_idx+1,derivative_idx+1)
+                ELEMENT_NODE_VERSION = REGION.MESHES.MeshElementsNodeVersionGet(MESH_USER_NUMBER,MESH_COMPONENT_USER_NUMBER,ELEMENT_USER_NUMBER,node_idx+1,derivative_idx+1,FIELD_COMPONENT_USER_NUMBER)
                 ELEMENT_VALUES[node_idx][derivative_idx] = self.FieldParameterSetNodeValueGet(FIELD_USER_NUMBER,FIELD_VARIABLE_USER_NUMBER,ELEMENT_NODE_VERSION,derivative_idx+1,MESH_ELEMENT_USER_NODES[node_idx],FIELD_COMPONENT_USER_NUMBER)
         return ELEMENT_VALUES
 
