@@ -39,6 +39,7 @@
 #> the terms of any one of the MPL, the GPL or the LGPL.
 #>
 
+import os
 import re
 import fem_topology
 import fem_miscellaneous_routines
@@ -378,8 +379,6 @@ def WriteIpBase(FIELD_VARIABLE,OUTPUT_FILENAME):
     NUMBER_OF_FIELD_COMPONENTS = FIELD_VARIABLE.NUMBER_OF_FIELD_COMPONENTS
     NUMBER_OF_DERIVATIVES = MESH_COMPONENT.NODES.BASIS_MAX_NUMBER_OF_DERIVATIVES
     FILE = open(OUTPUT_FILENAME + ".ipbase", 'w')
-
-    print NUMBER_OF_DERIVATIVES
 
     if NUMBER_OF_DERIVATIVES == 1:
         OUTPUT = \
@@ -836,6 +835,9 @@ def WriteIpCoor(FIELD_VARIABLE,OUTPUT_FILENAME):
 def WriteCmCom(FIELD_VARIABLE,OUTPUT_FILENAME):
     FILE = open(OUTPUT_FILENAME + "CMISS.com", 'w')
     output_info = OUTPUT_FILENAME.split("/")
+    #print output_info [:-1]
+    #print os.sep.join(output_info[:-1])
+    #print os.sep.join(output_info[:-1])+ '/para.ippara'
     OUTPUT = \
 " \n\
 fem def para;r;para\n\
@@ -848,7 +850,7 @@ fem export elem;%s"%output_info[-1] +" as %s"%output_info[-1]+"\n\
 q\n"
     FILE.write(OUTPUT)
     FILE.close()
-    FILE = open('para.ippara', 'w')
+    FILE = open(os.sep.join(output_info[:-1]) + '/para.ippara', 'w')
     OUTPUT = \
 " CMISS Version 2.1  ippara File Version 1\n\
  Heading:\n\
