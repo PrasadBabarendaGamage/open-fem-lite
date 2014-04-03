@@ -850,7 +850,9 @@ fem export elem;%s"%output_info[-1] +" as %s"%output_info[-1]+"\n\
 q\n"
     FILE.write(OUTPUT)
     FILE.close()
-    FILE = open(os.sep.join(output_info[:-1]) + '/para.ippara', 'w')
+    print os.sep.join(output_info[:-1])
+    FILE = open('./para.ippara', 'w')
+    #FILE = open(os.sep.join(output_info[:-1]) + './para.ippara', 'w')
     OUTPUT = \
 " CMISS Version 2.1  ippara File Version 1\n\
  Heading:\n\
