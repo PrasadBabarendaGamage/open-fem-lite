@@ -65,7 +65,7 @@ def global_number_get(attribute, reference):
             globalNumber = attribute.globalToLabelMap.index(reference)  # Invese map
         except ValueError:
             raise ValueError(
-                'The specified reference of {:} is invalid for {:'.format(
+                'The specified reference of {:} is invalid for {:}'.format(
                       reference, attribute.identifier))
     return globalNumber
 
@@ -269,18 +269,30 @@ class Bases():
         if BASIS.TYPE == "2DLinearLagrange":
             BASIS.NUMBER_OF_NODES = 4 #!<The number of local nodes in the basis.
             BASIS.NUMBER_OF_PARTIAL_DERIVATIVES = 1 #!<The number of paratial derivatives for the basis. Old CMISS name NUT(nbf)
+            NUMBER_OF_NODES_XIC = 2
         elif BASIS.TYPE == "3DLinearLagrange":
             BASIS.NUMBER_OF_NODES = 8 #!<The number of local nodes in the basis.
             BASIS.NUMBER_OF_PARTIAL_DERIVATIVES = 1 #!<The number of paratial derivatives for the basis. Old CMISS name NUT(nbf)
+            NUMBER_OF_NODES_XIC = 2
+        elif BASIS.TYPE == "3DQuadraticLagrange":
+            BASIS.NUMBER_OF_NODES = 27 #!<The number of local nodes in the basis.
+            BASIS.NUMBER_OF_PARTIAL_DERIVATIVES = 1 #!<The number of paratial derivatives for the basis. Old CMISS name NUT(nbf)
+            NUMBER_OF_NODES_XIC = 3
+        elif BASIS.TYPE == "3DCubicLagrange":
+            BASIS.NUMBER_OF_NODES = 64 #!<The number of local nodes in the basis.
+            BASIS.NUMBER_OF_PARTIAL_DERIVATIVES = 1 #!<The number of paratial derivatives for the basis. Old CMISS name NUT(nbf)
+            NUMBER_OF_NODES_XIC = 2
         elif BASIS.TYPE == "2DCubicHermite":
             BASIS.NUMBER_OF_NODES = 4 #!<The number of local nodes in the basis.
             BASIS.NUMBER_OF_PARTIAL_DERIVATIVES = 4 #!<The number of paratial derivatives for the basis. Old CMISS name NUT(nbf)
+            NUMBER_OF_NODES_XIC = 2
         elif BASIS.TYPE == "3DCubicHermite":
             BASIS.NUMBER_OF_NODES = 8 #!<The number of local nodes in the basis.
             BASIS.NUMBER_OF_PARTIAL_DERIVATIVES = 8 #!<The number of paratial derivatives for the basis. Old CMISS name NUT(nbf)
+            NUMBER_OF_NODES_XIC = 2
         else:
             raise ValueError('Basis TYPE of \'%s\' is invalid.' %TYPE)
-        BASIS.NUMBER_OF_NODES_XIC = [2]*(BASIS.NUMBER_OF_XIC) # !<NUMBER_OF_XIC(ni). The number of local nodes in the ni'th direction in the basis.
+        BASIS.NUMBER_OF_NODES_XIC = [NUMBER_OF_NODES_XIC]*(BASIS.NUMBER_OF_XIC) # !<NUMBER_OF_XIC(ni). The number of local nodes in the ni'th direction in the basis.
         #!Quadrature
         BASIS.NUMBER_OF_ELEMENT_PARAMETERS = BASIS.NUMBER_OF_NODES*BASIS.NUMBER_OF_XIC #!<The number of element parameters in the basis.
         #Calculate Quadrature Parameters 
