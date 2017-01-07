@@ -227,7 +227,7 @@ def WriteIpElem(FIELD_VARIABLE,OUTPUT_FILENAME):
         OUTPUT = OUTPUT + " Enter the %d global numbers for basis 1:" % BASIS.NUMBER_OF_NODES
         for node_idx in range(BASIS.NUMBER_OF_NODES):
             user_element_node_number = MESH_ELEMENT.USER_ELEMENT_NODES[node_idx]
-            OUTPUT = OUTPUT + " "+"%5d" %user_element_node_number
+            OUTPUT = OUTPUT + " "+"%d" %user_element_node_number
         OUTPUT = OUTPUT + " \n"
         if MESH_COMPONENT.NODES.MULTIPLE_VERSIONS:
             for element_node_idx, user_element_node_number in enumerate(MESH_ELEMENT.USER_ELEMENT_NODES):
@@ -380,8 +380,49 @@ def WriteIpBase(FIELD_VARIABLE,OUTPUT_FILENAME):
     NUMBER_OF_DERIVATIVES = MESH_COMPONENT.NODES.BASIS_MAX_NUMBER_OF_DERIVATIVES
     FILE = open(OUTPUT_FILENAME + ".ipbase", 'w')
 
+
     if NUMBER_OF_DERIVATIVES == 1:
-        OUTPUT = \
+        if BASIS.NUMBER_OF_XIC == 2:
+            OUTPUT = \
+" CMISS Version 2.1  ipbase File Version 2\n\
+ Heading:\n\
+ \n\
+ Enter the number of types of basis function [1]: 1\n\
+ \n\
+ For basis function type 1 the type of nodal interpolation is [1]:\n\
+   (0) Auxiliary basis only\n\
+   (1) Lagrange/Hermite tensor prod\n\
+   (2) Simplex/Serendipity/Sector\n\
+   (3) B-spline tensor product\n\
+   (4) Fourier Series/Lagrange/Hermite tensor prod\n\
+   (5) Boundary Element Lagrange/Hermite tensor pr.\n\
+   (6) Boundary Element Simplex/Serendipity/Sector\n\
+   (7) Extended Lagrange (multigrid collocation)\n\
+    1\n\
+ Enter the number of Xi-coordinates [1]: 2\n\
+ \n\
+ The interpolant in the Xi(1) direction is [1]:\n\
+   (1) Linear Lagrange\n\
+   (2) Quadratic Lagrange\n\
+   (3) Cubic Lagrange\n\
+   (4) Quadratic Hermite\n\
+   (5) Cubic Hermite\n\
+    1\n\
+ Enter the number of Gauss points in the Xi(1) direction [2]: 2\n\
+ \n\
+ The interpolant in the Xi(2) direction is [1]:\n\
+   (1) Linear Lagrange\n\
+   (2) Quadratic Lagrange\n\
+   (3) Cubic Lagrange\n\
+   (4) Quadratic Hermite\n\
+   (5) Cubic Hermite\n\
+    1\n\
+ Enter the number of Gauss points in the Xi(2) direction [2]: 2\n\
+ Enter the node position indices [11211222]: 1 1 2 1 1 2 2 2\n\
+ Enter the number of auxiliary element parameters [0]: 0\n"
+
+        elif BASIS.NUMBER_OF_XIC == 3:
+            OUTPUT = \
 " CMISS Version 1.21 ipbase File Version 2\n\
  \n\
  Enter the number of types of basis function [1]: 2\n\
@@ -458,6 +499,9 @@ def WriteIpBase(FIELD_VARIABLE,OUTPUT_FILENAME):
  Enter the number of Gauss points in the Xi(2) direction [2]: 2\n\
  Enter the node position indices [11211222]: 1 1 2 1 1 2 2 2\n\
  Enter the number of auxiliary element parameters [0]: 0\n"
+
+        else:
+            raise ValueError('Invalid basis number of xi coordinates')
 
     else:
         if BASIS.scaling_type is 'harmonic':
@@ -852,7 +896,7 @@ q\n"
     FILE.close()
     print os.sep.join(output_info[:-1])
     FILE = open('./para.ippara', 'w')
-    #FILE = open(os.sep.join(output_info[:-1]) + './para.ippara', 'w')
+    #FILE = open(os.sep.join(output_info[:-1]) + '/para.ippara', 'w')
     OUTPUT = \
 " CMISS Version 2.1  ippara File Version 1\n\
  Heading:\n\
@@ -864,8 +908,8 @@ q\n"
  Max# elements                      (NEM)[1]:     50000\n\
  Max# elements in a region       (NE_R_M)[1]:     50000\n\
  Max# adjacent elements in Xi      (NEIM)[1]:       500\n\
- Max# global face segments          (NFM)[1]:       751\n\
- Max# faces in a region          (NF_R_M)[1]:       751\n\
+ Max# global face segments          (NFM)[1]:      1461\n\
+ Max# faces in a region          (NF_R_M)[1]:      1461\n\
  Max# local Voronoi faces         (NFVCM)[1]:         6\n\
  Max# Gauss points per element      (NGM)[1]:        81\n\
  Max# dependent variables           (NHM)[1]:         6\n\
@@ -1351,15 +1395,19 @@ def ReadIpMesh(REGION,BASIS_USER_NUMBER,MESH_USER_NUMBER,FIELD_USER_NUMBER,IPNOD
                 if DEBUG==True: print "LOCAL_NODE_NUMBER %s" %LOCAL_NODE_NUMBER
                 line = line + 1
                 for component_idx in range(BASIS.NUMBER_OF_XIC):
-                    FIELD_NODE_EXISTS = REGION.FIELDS.FieldParameterNodeCheckExists(FIELD_USER_NUMBER,FIELD_VARIABLE_USER_NUMBER,LOCAL_NODE_NUMBER,component_idx+1)
-                    if FIELD_NODE_EXISTS == True:
-                        if DEBUG==True: print "  component_idx %d" %(component_idx+1)
-                        for derivative_idx in range(NUMBER_OF_COMPONENT_DERIVATIVES[component_idx]+1):
-                            if DEBUG==True: print "   derivative_idx %d" %(derivative_idx+1)
-                            if DEBUG==True: print IPNODE_LINES[line]
-                            VALUE = float(IPNODE_LINES[line].split()[-1])
-                            REGION.FIELDS.FieldParameterSetUpdateNode(FIELD_USER_NUMBER,FIELD_VARIABLE_USER_NUMBER,VERSION_NUMBER,derivative_idx+1,LOCAL_NODE_NUMBER,component_idx+1,VALUE)
-                            line = line + 1
+                    try:
+                        FIELD_NODE_EXISTS = REGION.FIELDS.FieldParameterNodeCheckExists(FIELD_USER_NUMBER,FIELD_VARIABLE_USER_NUMBER,LOCAL_NODE_NUMBER,component_idx+1)
+                    except:
+                        break
+                    else:
+                        if FIELD_NODE_EXISTS == True:
+                            if DEBUG==True: print "  component_idx %d" %(component_idx+1)
+                            for derivative_idx in range(NUMBER_OF_COMPONENT_DERIVATIVES[component_idx]+1):
+                                if DEBUG==True: print "   derivative_idx %d" %(derivative_idx+1)
+                                if DEBUG==True: print IPNODE_LINES[line]
+                                VALUE = float(IPNODE_LINES[line].split()[-1])
+                                REGION.FIELDS.FieldParameterSetUpdateNode(FIELD_USER_NUMBER,FIELD_VARIABLE_USER_NUMBER,VERSION_NUMBER,derivative_idx+1,LOCAL_NODE_NUMBER,component_idx+1,VALUE)
+                                line = line + 1
 
 def WriteIpMap(nodes, derivatives, output_filename):
     number_of_components = 3
