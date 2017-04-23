@@ -12,7 +12,7 @@
    (5) Boundary Element Lagrange/Hermite tensor pr.
    (6) Boundary Element Simplex/Serendipity/Sector
    (7) Extended Lagrange (multigrid collocation)
-	1
+    1
  Enter the number of Xi-coordinates [1]: 3
 
  The interpolant in the Xi(1) direction is [1]:
@@ -21,7 +21,7 @@
    (3) Cubic Lagrange
    (4) Quadratic Hermite
    (5) Cubic Hermite
-	5
+    5
  Enter the number of Gauss points in the Xi(1) direction [2]: 4
  The interpolant in the Xi(2) direction is [1]:
    (1) Linear Lagrange
@@ -29,7 +29,7 @@
    (3) Cubic Lagrange
    (4) Quadratic Hermite
    (5) Cubic Hermite
-	5
+    5
  Enter the number of Gauss points in the Xi(2) direction [2]: 4
  The interpolant in the Xi(3) direction is [1]:
    (1) Linear Lagrange
@@ -37,7 +37,7 @@
    (3) Cubic Lagrange
    (4) Quadratic Hermite
    (5) Cubic Hermite
-	5
+    5
  Enter the number of Gauss points in the Xi(3) direction [2]: 4
  Do you want to set cross derivatives to zero [N]? N
  Enter the node position indices []: 1 1 1 2 1 1 1 2 1 2 2 1 1 1 2 2 1 2 1 2 2 2 2 2
@@ -52,7 +52,7 @@
    (5) Calculated from arc length
    (6) Calculated from arithmetic mean arc length
    (7) Calculated from harmonic mean arc length
-	6
+    7
  For basis function type 2 the type of nodal interpolation is [1]:
    (0) Auxiliary basis only
    (1) Lagrange/Hermite tensor prod
@@ -62,7 +62,7 @@
    (5) Boundary Element Lagrange/Hermite tensor pr.
    (6) Boundary Element Simplex/Serendipity/Sector
    (7) Extended Lagrange (multigrid collocation)
-	1
+    1
  Enter the number of Xi-coordinates [1]: 2
 
  The interpolant in the Xi(1) direction is [1]:
@@ -71,7 +71,7 @@
    (3) Cubic Lagrange
    (4) Quadratic Hermite
    (5) Cubic Hermite
-	5
+    5
  Enter the number of Gauss points in the Xi(1) direction [2]: 4
  The interpolant in the Xi(2) direction is [1]:
    (1) Linear Lagrange
@@ -79,7 +79,7 @@
    (3) Cubic Lagrange
    (4) Quadratic Hermite
    (5) Cubic Hermite
-	5
+    5
  Enter the number of Gauss points in the Xi(2) direction [2]: 4
  Do you want to set cross derivatives to zero [N]? N
  Enter the node position indices []: 1 1 2 1 1 2 2 2
@@ -94,4 +94,4 @@
    (5) Calculated from arc length
    (6) Calculated from arithmetic mean arc length
    (7) Calculated from harmonic mean arc length
-	6
+    7
