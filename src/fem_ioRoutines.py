@@ -919,7 +919,7 @@ q\n"
  Max# global line segments          (NLM)[1]:      5000\n\
  Max# lines in a region          (NL_R_M)[1]:      5000\n\
  Max# material parameters           (NMM)[1]:        35\n\
- Max# element nodes                 (NNM)[1]:        12\n\
+ Max# element nodes                 (NNM)[1]:        27\n\
  Max# degrees of freedom            (NOM)[1]:      5000\n\
  Max# global nodes                  (NPM)[1]:     50000\n\
  Max# global nodes in a region   (NP_R_M)[1]:     50000\n\
