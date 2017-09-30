@@ -227,7 +227,11 @@ def WriteIpElem(FIELD_VARIABLE,OUTPUT_FILENAME):
         OUTPUT = OUTPUT + " Enter the %d global numbers for basis 1:" % BASIS.NUMBER_OF_NODES
         for node_idx in range(BASIS.NUMBER_OF_NODES):
             user_element_node_number = MESH_ELEMENT.USER_ELEMENT_NODES[node_idx]
-            OUTPUT = OUTPUT + " "+"%d" %user_element_node_number
+            if BASIS.TYPE == '3DQuadraticLagrange' and node_idx == 15:
+                OUTPUT = OUTPUT + " " + "%d\n" % user_element_node_number
+            else:
+                OUTPUT = OUTPUT + " "+"%d" %user_element_node_number
+
         OUTPUT = OUTPUT + " \n"
         if MESH_COMPONENT.NODES.MULTIPLE_VERSIONS:
             for element_node_idx, user_element_node_number in enumerate(MESH_ELEMENT.USER_ELEMENT_NODES):
@@ -422,7 +426,113 @@ def WriteIpBase(FIELD_VARIABLE,OUTPUT_FILENAME):
  Enter the number of auxiliary element parameters [0]: 0\n"
 
         elif BASIS.NUMBER_OF_XIC == 3:
-            OUTPUT = \
+            if BASIS.TYPE == '3DQuadraticLagrange':
+                OUTPUT = \
+" CMISS Version 2.1  ipbase File Version 2\n\
+ Heading:\n\
+ \n\
+ Enter the number of types of basis function [1]: 2\n\
+ \n\
+ For basis function type 1 the type of nodal interpolation is [1]:\n\
+   (0) Auxiliary basis only\n\
+   (1) Lagrange/Hermite tensor prod\n\
+   (2) Simplex/Serendipity/Sector\n\
+   (3) B-spline tensor product\n\
+   (4) Fourier Series/Lagrange/Hermite tensor prod\n\
+   (5) Boundary Element Lagrange/Hermite tensor pr.\n\
+   (6) Boundary Element Simplex/Serendipity/Sector\n\
+   (7) Extended Lagrange (multigrid collocation)\n\
+    1\n\
+ Enter the number of Xi-coordinates [1]: 3\n\
+ \n\
+ The interpolant in the Xi(1) direction is [1]:\n\
+   (1) Linear Lagrange\n\
+   (2) Quadratic Lagrange\n\
+   (3) Cubic Lagrange\n\
+   (4) Quadratic Hermite\n\
+   (5) Cubic Hermite\n\
+    2\n\
+ Enter the number of Gauss points in the Xi(1) direction [3]: 3\n\
+ \n\
+ The interpolant in the Xi(2) direction is [1]:\n\
+   (1) Linear Lagrange\n\
+   (2) Quadratic Lagrange\n\
+   (3) Cubic Lagrange\n\
+   (4) Quadratic Hermite\n\
+   (5) Cubic Hermite\n\
+    2\n\
+ Enter the number of Gauss points in the Xi(2) direction [3]: 3\n\
+ \n\
+ The interpolant in the Xi(3) direction is [1]:\n\
+   (1) Linear Lagrange\n\
+   (2) Quadratic Lagrange\n\
+   (3) Cubic Lagrange\n\
+   (4) Quadratic Hermite\n\
+   (5) Cubic Hermite\n\
+    2\n\
+ Enter the number of Gauss points in the Xi(3) direction [3]: 3\n\
+ Enter the node position indices for local node  1 [111]: 1 1 1\n\
+ Enter the node position indices for local node  2 [211]: 2 1 1\n\
+ Enter the node position indices for local node  3 [311]: 3 1 1\n\
+ Enter the node position indices for local node  4 [121]: 1 2 1\n\
+ Enter the node position indices for local node  5 [221]: 2 2 1\n\
+ Enter the node position indices for local node  6 [321]: 3 2 1\n\
+ Enter the node position indices for local node  7 [131]: 1 3 1\n\
+ Enter the node position indices for local node  8 [231]: 2 3 1\n\
+ Enter the node position indices for local node  9 [331]: 3 3 1\n\
+ Enter the node position indices for local node 10 [112]: 1 1 2\n\
+ Enter the node position indices for local node 11 [212]: 2 1 2\n\
+ Enter the node position indices for local node 12 [312]: 3 1 2\n\
+ Enter the node position indices for local node 13 [122]: 1 2 2\n\
+ Enter the node position indices for local node 14 [222]: 2 2 2\n\
+ Enter the node position indices for local node 15 [322]: 3 2 2\n\
+ Enter the node position indices for local node 16 [132]: 1 3 2\n\
+ Enter the node position indices for local node 17 [232]: 2 3 2\n\
+ Enter the node position indices for local node 18 [332]: 3 3 2\n\
+ Enter the node position indices for local node 19 [113]: 1 1 3\n\
+ Enter the node position indices for local node 20 [213]: 2 1 3\n\
+ Enter the node position indices for local node 21 [313]: 3 1 3\n\
+ Enter the node position indices for local node 22 [123]: 1 2 3\n\
+ Enter the node position indices for local node 23 [223]: 2 2 3\n\
+ Enter the node position indices for local node 24 [323]: 3 2 3\n\
+ Enter the node position indices for local node 25 [133]: 1 3 3\n\
+ Enter the node position indices for local node 26 [233]: 2 3 3\n\
+ Enter the node position indices for local node 27 [333]: 3 3 3\n\
+ Enter the number of auxiliary element parameters [0]: 0\n\
+ \n\
+ For basis function type 2 the type of nodal interpolation is [1]:\n\
+   (0) Auxiliary basis only\n\
+   (1) Lagrange/Hermite tensor prod\n\
+   (2) Simplex/Serendipity/Sector\n\
+   (3) B-spline tensor product\n\
+   (4) Fourier Series/Lagrange/Hermite tensor prod\n\
+   (5) Boundary Element Lagrange/Hermite tensor pr.\n\
+   (6) Boundary Element Simplex/Serendipity/Sector\n\
+   (7) Extended Lagrange (multigrid collocation)\n\
+    1\n\
+ Enter the number of Xi-coordinates [1]: 2\n\
+ \n\
+ The interpolant in the Xi(1) direction is [1]:\n\
+   (1) Linear Lagrange\n\
+   (2) Quadratic Lagrange\n\
+   (3) Cubic Lagrange\n\
+   (4) Quadratic Hermite\n\
+   (5) Cubic Hermite\n\
+    2\n\
+ Enter the number of Gauss points in the Xi(1) direction [3]: 3\n\
+ \n\
+ The interpolant in the Xi(2) direction is [1]:\n\
+   (1) Linear Lagrange\n\
+   (2) Quadratic Lagrange\n\
+   (3) Cubic Lagrange\n\
+   (4) Quadratic Hermite\n\
+   (5) Cubic Hermite\n\
+    2\n\
+ Enter the number of Gauss points in the Xi(2) direction [3]: 3\n\
+ Enter the node position indices [112131122232132333]: 1 1 2 1 3 1 1 2 2 2 3 2 1 3 2 3 3 3\n\
+ Enter the number of auxiliary element parameters [0]: 0\n"
+            else:
+                OUTPUT = \
 " CMISS Version 1.21 ipbase File Version 2\n\
  \n\
  Enter the number of types of basis function [1]: 2\n\
