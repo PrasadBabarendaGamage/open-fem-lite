@@ -1336,14 +1336,14 @@ class NodeGroups():
     def display_node_groups(self, listNodes=False, listDerivatives=False):
         for userNumber in self.globalToUserMap:
             nodeGroup = self.node_group_global_get(userNumber)
-            print 'Group {0:>3} Label= {1:<30} Total= {2:>4}'.format(
-                userNumber, nodeGroup.label, nodeGroup.numberOfNodes)
+            print('Group {0:>3} Label= {1:<30} Total= {2:>4}'.format(
+                userNumber, nodeGroup.label, nodeGroup.numberOfNodes))
             if listNodes:
-                print 'Nodes:'
+                print('Nodes:')
                 pp = pprint.PrettyPrinter()
                 pp.pprint(nodeGroup.nodes)
             if listDerivatives:
-                print 'Derivatives:'
+                print('Derivatives:')
                 pp = pprint.PrettyPrinter()
                 pp.pprint(nodeGroup.bc.derivatives)
 

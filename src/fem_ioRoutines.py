@@ -1004,7 +1004,7 @@ fem export elem;%s"%output_info[-1] +" as %s"%output_info[-1]+"\n\
 q\n"
     FILE.write(OUTPUT)
     FILE.close()
-    print os.sep.join(output_info[:-1])
+    print(os.sep.join(output_info[:-1]))
     FILE = open('./para.ippara', 'w')
     #FILE = open(os.sep.join(output_info[:-1]) + '/para.ippara', 'w')
     OUTPUT = \
@@ -1412,7 +1412,7 @@ def ReadIpMesh(REGION,BASIS_USER_NUMBER,MESH_USER_NUMBER,FIELD_USER_NUMBER,IPNOD
         if IPELEM_LINES[line][0:16] == " Element number ":
             LOCAL_ELEMENT_NUMBER = int(IPELEM_LINES[line].split()[-1])
             ELEMENT_NODES = [int(values) for values in IPELEM_LINES[line+BASIS.NUMBER_OF_XIC+2].split()[8:8+BASIS.NUMBER_OF_NODES]]
-            if DEBUG==True: print "Element Number:{0}, element nodes: {1}".format(LOCAL_ELEMENT_NUMBER,ELEMENT_NODES)
+            if DEBUG==True: print("Element Number:{0}, element nodes: {1}".format(LOCAL_ELEMENT_NUMBER,ELEMENT_NODES))
             REGION.MESHES.MeshElementsNodesSet(MESH_USER_NUMBER,MESH_COMPONENT_NUMBER,LOCAL_ELEMENT_NUMBER,ELEMENT_NODES)
             line = line + 1 + BASIS.NUMBER_OF_XIC+2
             while IPELEM_LINES[line][0:12] == " The version":
@@ -1471,7 +1471,7 @@ def ReadIpMesh(REGION,BASIS_USER_NUMBER,MESH_USER_NUMBER,FIELD_USER_NUMBER,IPNOD
         for line in range(len(IPNODE_LINES)):
             if IPNODE_LINES[line][0:13] == " Node number ":
                 LOCAL_NODE_NUMBER = int(IPNODE_LINES[line].split()[-1])
-                if DEBUG==True: print "LOCAL_NODE_NUMBER %s" %LOCAL_NODE_NUMBER
+                if DEBUG==True: print("LOCAL_NODE_NUMBER %s" %LOCAL_NODE_NUMBER)
                 if sum(COMPONENT_VERSIONS_PRESENT) > 0:
                     line = line + 1
                 for component_idx in range(BASIS.NUMBER_OF_XIC):
@@ -1482,15 +1482,15 @@ def ReadIpMesh(REGION,BASIS_USER_NUMBER,MESH_USER_NUMBER,FIELD_USER_NUMBER,IPNOD
                     else:
                         NUMBER_OF_VERSIONS = 1
                     line = line + 1
-                    if DEBUG==True: print "  component_idx %d" %(component_idx+1)
+                    if DEBUG==True: print("  component_idx %d" %(component_idx+1))
                     ###################### TEMP
                     #NUMBER_OF_VERSIONS = 1
                     ###################### TEMP
                     for version_idx in range(NUMBER_OF_VERSIONS):
-                        if DEBUG==True: print "   version_idx %d" %(version_idx+1)
+                        if DEBUG==True: print("   version_idx %d" %(version_idx+1))
                         for derivative_idx in range(NUMBER_OF_COMPONENT_DERIVATIVES[component_idx]+1):
-                            if DEBUG==True: print "   derivative_idx %d" %(derivative_idx+1)
-                            if DEBUG==True: print IPNODE_LINES[line]
+                            if DEBUG==True: print("   derivative_idx %d" %(derivative_idx+1))
+                            if DEBUG==True: print(IPNODE_LINES[line])
                             VALUE = float(IPNODE_LINES[line].split()[-1])
                             REGION.FIELDS.FieldParameterSetUpdateNode(FIELD_USER_NUMBER,FIELD_VARIABLE_USER_NUMBER,version_idx+1,derivative_idx+1,LOCAL_NODE_NUMBER,component_idx+1,VALUE)
                             line = line + 1
@@ -1499,10 +1499,10 @@ def ReadIpMesh(REGION,BASIS_USER_NUMBER,MESH_USER_NUMBER,FIELD_USER_NUMBER,IPNOD
     else:
         VERSION_NUMBER = 1
         for line in range(len(IPNODE_LINES)):
-            if DEBUG==True: print IPNODE_LINES[line]
+            if DEBUG==True: print(IPNODE_LINES[line])
             if IPNODE_LINES[line][0:13] == " Node number ":
                 LOCAL_NODE_NUMBER = int(IPNODE_LINES[line].split()[-1])
-                if DEBUG==True: print "LOCAL_NODE_NUMBER %s" %LOCAL_NODE_NUMBER
+                if DEBUG==True: print("LOCAL_NODE_NUMBER %s" %LOCAL_NODE_NUMBER)
                 line = line + 1
                 for component_idx in range(BASIS.NUMBER_OF_XIC):
                     try:
@@ -1511,10 +1511,10 @@ def ReadIpMesh(REGION,BASIS_USER_NUMBER,MESH_USER_NUMBER,FIELD_USER_NUMBER,IPNOD
                         break
                     else:
                         if FIELD_NODE_EXISTS == True:
-                            if DEBUG==True: print "  component_idx %d" %(component_idx+1)
+                            if DEBUG==True: print("  component_idx %d" %(component_idx+1))
                             for derivative_idx in range(NUMBER_OF_COMPONENT_DERIVATIVES[component_idx]+1):
-                                if DEBUG==True: print "   derivative_idx %d" %(derivative_idx+1)
-                                if DEBUG==True: print IPNODE_LINES[line]
+                                if DEBUG==True: print("   derivative_idx %d" %(derivative_idx+1))
+                                if DEBUG==True: print(IPNODE_LINES[line])
                                 VALUE = float(IPNODE_LINES[line].split()[-1])
                                 REGION.FIELDS.FieldParameterSetUpdateNode(FIELD_USER_NUMBER,FIELD_VARIABLE_USER_NUMBER,VERSION_NUMBER,derivative_idx+1,LOCAL_NODE_NUMBER,component_idx+1,VALUE)
                                 line = line + 1
