@@ -650,6 +650,27 @@ class Fields():
                 ELEMENT_VALUES[node_idx][derivative_idx] = self.FieldParameterSetNodeValueGet(FIELD_USER_NUMBER,FIELD_VARIABLE_USER_NUMBER,ELEMENT_NODE_VERSION,derivative_idx+1,MESH_ELEMENT_USER_NODES[node_idx],FIELD_COMPONENT_USER_NUMBER)
         return ELEMENT_VALUES
 
+    def FieldParameterElementValuesGetAndNodes(self,FIELD_USER_NUMBER,FIELD_VARIABLE_USER_NUMBER,ELEMENT_USER_NUMBER,FIELD_COMPONENT_USER_NUMBER):
+        REGION = self.REGION
+        FIELD = self.FieldGlobalGet(FIELD_USER_NUMBER)
+        FIELD_VARIABLE = FIELD.FieldVariableGlobalGet(FIELD_VARIABLE_USER_NUMBER)
+        FIELD_COMPONENT = FIELD_VARIABLE.FieldComponentGlobalGet(FIELD_COMPONENT_USER_NUMBER)
+        MESH = FIELD.MESH
+        MESH_USER_NUMBER=MESH.USER_NUMBER
+        MESH_COMPONENT = FIELD_COMPONENT.MESH_COMPONENT
+        MESH_COMPONENT_USER_NUMBER=MESH_COMPONENT.USER_NUMBER
+        MESH_NODES = MESH_COMPONENT.NODES
+        MESH_ELEMENTS = MESH_COMPONENT.ELEMENTS
+        MESH_ELEMENT = MESH_ELEMENTS.MeshElementGlobalGet(ELEMENT_USER_NUMBER)
+        BASIS = MESH_ELEMENT.BASIS
+        MESH_ELEMENT_USER_NODES = REGION.MESHES.MeshElementsNodesGet(MESH_USER_NUMBER,MESH_COMPONENT_USER_NUMBER,ELEMENT_USER_NUMBER)
+        ELEMENT_VALUES = fem_miscellaneous_routines.initialize2DList(float(0.0),BASIS.NUMBER_OF_NODES,BASIS.NUMBER_OF_PARTIAL_DERIVATIVES)
+        for node_idx in range(BASIS.NUMBER_OF_NODES):
+            for derivative_idx in range(BASIS.NUMBER_OF_PARTIAL_DERIVATIVES):
+                ELEMENT_NODE_VERSION = REGION.MESHES.MeshElementsNodeVersionGet(MESH_USER_NUMBER,MESH_COMPONENT_USER_NUMBER,ELEMENT_USER_NUMBER,node_idx+1,derivative_idx+1,FIELD_COMPONENT_USER_NUMBER)
+                ELEMENT_VALUES[node_idx][derivative_idx] = self.FieldParameterSetNodeValueGet(FIELD_USER_NUMBER,FIELD_VARIABLE_USER_NUMBER,ELEMENT_NODE_VERSION,derivative_idx+1,MESH_ELEMENT_USER_NODES[node_idx],FIELD_COMPONENT_USER_NUMBER)
+        return ELEMENT_VALUES,MESH_ELEMENT_USER_NODES
+
     def FieldInterpolationParametersElementGet(self,FIELD_USER_NUMBER,FIELD_VARIABLE_USER_NUMBER,ELEMENT_USER_NUMBER):
         REGION = self.REGION
         FIELD = self.FieldGlobalGet(FIELD_USER_NUMBER)
@@ -1131,6 +1152,10 @@ class GeneratedMeshes():
         GENERATED_MESH = self.GENERATED_MESHES[GLOBAL_NUMBER]
         GENERATED_MESH.REGION = self.REGION
         fem_generatedMeshRoutines.GENERATED_MESH_REGULAR_CREATE(GENERATED_MESH)
+
+    def GeneratedMeshesMeshGet(self,USER_NUMBER):
+        GLOBAL_NUMBER = self.GeneratedMeshglobal_number_get(USER_NUMBER)
+        return self.GENERATED_MESHES[GLOBAL_NUMBER]
 
     #Attaches a field to the generated  and calculates generated mesh geometric parameters
     def GeneratedMeshGeometricParametersCalculate(self,FIELD_USER_NUMBER,GENERATED_MESH_USER_NUMBER):
